@@ -7,6 +7,12 @@
 - **AWS Certified Cloud Practitioner**: 2026蟷ｴ3譛井ｸ区流 蜿鈴ｨ謎ｺ亥ｮ・
 
 ## 繝輔か繝ｫ繝讒区・
-- `sukkiri-java/`: 縲弱せ繝・く繝ｪ繧上°繧徽ava蜈･髢縲上・貍皮ｿ偵さ繝ｼ繝・
-- `Udemy-archives/`: 驕主悉縺ｮUdemy貍皮ｿ偵・險倬鹸
-- `.gitignore`: 荳崎ｦ√↑繝輔ぃ繧､繝ｫ繧堤ｮ｡逅・°繧牙､悶☆險ｭ螳
+- `Java繝ｼblackbook/`: Java Black Book縺ｮ蟄ｦ鄙貞・螳ｹ
+- `learningNote/`: 蟄ｦ鄙偵ヮ繝ｼ繝茨ｼ・ava螳溯｡後お繝ｩ繝ｼ縲∝庄螟蛾聞蠑墓焚縺ｪ縺ｩ縺ｮ蟄ｦ鄙定ｨ倬鹸・・
+- `Udemy-uzuzjavabasic-archives/`: Udemy縲後≧縺壹≧縺哽ava蝓ｺ遉弱阪・貍皮ｿ偵い繝ｼ繧ｫ繧､繝・
+- `.gitignore`: 荳崎ｦ√↑繝輔ぃ繧､繝ｫ繧堤ｮ｡逅・°繧牙､悶☆險ｭ螳・
+
+## 蟄ｦ鄙貞・螳ｹ
+- Java蝓ｺ遉取枚豕輔・蟄ｦ鄙偵→螳溯ｷｵ
+- Java Silver SE 17縺ｮ隧ｦ鬨灘ｯｾ遲・
+- 蟄ｦ鄙剃ｸｭ縺ｫ逋ｺ逕溘＠縺溘お繝ｩ繝ｼ繧・桝蝠冗せ縺ｮ險倬鹸繝ｻ隗｣豎ｺ
