@@ -1,17 +1,131 @@
-# Javaのコンパイル済みファイル（不要なもの）
+# ============================================
+# Java コンパイル済みファイル
+# ============================================
 *.class
+*.jar
+*.war
+*.ear
+*.nar
 
-# Cursor / VS Code の設定フォルダ（個人設定が含まれるため）
-.vscode/
-
-# OSが作成する一時ファイル
-.DS_Store
-Thumbs.db
-
-# 今後、Spring Bootなどで作成される一時フォルダ
+# ============================================
+# ビルド出力ディレクトリ
+# ============================================
 bin/
 build/
 target/
+out/
+dist/
+.gradle/
 
-# 書籍のサンプルコード（著作権保護のためアップロードしない）
+# ============================================
+# IDE設定ファイル（個人設定が含まれるため）
+# ============================================
+# Eclipse
+.project
+.classpath
+.settings/
+.metadata/
+.classpath
+.factorypath
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code / Cursor
+.vscode/
+.cursor/
+
+# NetBeans
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ============================================
+# 機密情報を含む可能性のあるファイル
+# ============================================
+# 環境変数ファイル
+.env
+.env.local
+.env.*.local
+*.env
+
+# 設定ファイル（機密情報が含まれる可能性）
+application-local.properties
+application-local.yml
+application-local.yaml
+config/local.properties
+secrets.properties
+
+# ============================================
+# ログファイルと一時ファイル
+# ============================================
+*.log
+*.log.*
+logs/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+
+# ============================================
+# OS固有のファイル
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# 書籍・教材のサンプルコード（著作権保護のため）
+# ============================================
 sukkiri-Java-reference-code/
+sukkiri_Java_reference_code/
+Udemy-uzuzjavabasic-archives/
+Udemy-archives/
+
+# ============================================
+# その他
+# ============================================
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# パッケージマネージャー
+node_modules/
+package-lock.json
+yarn.lock
+
+# テストカバレッジ
+coverage/
+*.coverage
+.nyc_output/
