@@ -1,4 +1,4 @@
-#  ITS 蜈･遉ｾ貅門ｙ繝励Ο繧ｸ繧ｧ繧ｯ繝・
+# 蜈･遉ｾ蜑榊ｭｦ鄙偵・繝ｭ繧ｸ繧ｧ繧ｯ繝・
 
 2026蟷ｴ4譛医・蜈･遉ｾ縺ｫ蜷代￠縺溘゛ava縺翫ｈ縺ｳIT繧ｹ繧ｭ繝ｫ縺ｮ蟄ｦ鄙偵Μ繝昴ず繝医Μ縺ｧ縺吶・
 
@@ -7,7 +7,7 @@
 - **App Development & DB Design**: 2026蟷ｴ2譛・譌･・・譛・譌･
   - 繧｢繝励Μ蜷・ My Career Consultant・亥ｭｦ鄙呈険繧願ｿ斐ｊBot・・
   - 謚陦薙せ繧ｿ繝・け: Cursor / Java 17 / Spring Boot 3 / PostgreSQL・・ocker・・ Thymeleaf
-  - 縲宣㍾隕√第ｵ√い繝ｼ繧ｭ繝・け繝√Ε・・trategy繝代ち繝ｼ繝ｳ・・
+  - 縲宣㍾隕√代い繝ｼ繧ｭ繝・け繝√Ε譁ｹ驥晢ｼ・trategy繝代ち繝ｼ繝ｳ・・
     - AiService繧､繝ｳ繧ｿ繝ｼ繝輔ぉ繝ｼ繧ｹ繧貞ｮ夂ｾｩ縺励＾penAiServiceImpl繧呈ｳｨ蜈･
     - 縲後％縺ｮ繧､繝ｳ繧ｿ繝ｼ繝輔ぉ繝ｼ繧ｹ險ｭ險医′縲∝ｰ・擂縺ｮWatsonX遘ｻ陦後↓縺ｩ縺・ｽｹ遶九▽縺具ｼ溘阪ｒCursor縺ｫ雉ｪ蝠上＠縺ｦ險ｭ險域э蝗ｳ繧定ｨ隱槫喧
 - **AWS Certified Cloud Practitioner**: 2026蟷ｴ3譛井ｸ区流 蜿鈴ｨ謎ｺ亥ｮ・
