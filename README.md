@@ -12,9 +12,9 @@
 - **AWS Certified Cloud Practitioner**: 2026年3月下旬 受験予定
 
 ## フォルダ構成
-- `java_blackbook/`: Java Black Bookの学習内容、章ごとの演習記録
+- `java_blackbook/`: Java Black Bookの演習ファイル
 - `learningNote/`: 学習ノート（日付ごとの記録）
-- `sukkiri_java/`: 「スッキリわかるJava」学習用コード
+- `sukkiri_java_exercises/`: 「スッキリわかるJava」演習メモ
 - `GIT_WORKFLOW_GUIDE.md`: Git運用ルール・手順
 - `SECURITY_CHECK.md`: セキュリティ観点のチェック項目
 - `.gitignore`: 不要なファイルを管理から外す設定
@@ -23,3 +23,6 @@
 - Java基礎文法の学習と実践
 - Java Silver SE 17の試験対策
 - 学習中に発生したエラーや疑問点の記録・解決
+- Java Black Bookの章末演習
+- 「スッキリわかるJava」演習の記録
+- 日々の学習ログ（`learningNote/`）
