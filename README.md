@@ -17,7 +17,8 @@
 - `sukkiri_java_exercises/`: 「スッキリわかるJava」演習メモ
 - `GIT_WORKFLOW_GUIDE.md`: Git運用ルール・手順
 - `SECURITY_CHECK.md`: セキュリティ観点のチェック項目
-- `.gitignore`: 不要なファイルを管理から外す設定
+- `.gitignore`: 不要な
+ファイルを管理から外す設定
 
 ## 学習内容
 - Java基礎文法の学習と実践
