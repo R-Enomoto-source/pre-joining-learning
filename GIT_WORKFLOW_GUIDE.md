@@ -311,6 +311,15 @@ git diff --staged
 - ✅ プッシュ前に`git status`で確認する習慣をつける
 - ✅ エラーが出たら、エラーメッセージを読んで対処する
 
+#### 補足：「プッシュ前に git status」のタイミング（任意）
+
+「プッシュ前に`git status`で確認」をより厳密にやる場合は、**`git commit` の直後、`git push` の前** に `git status` を実行すると、次を確認できます。
+
+- コミットがローカルに正しく記録されているか
+- まだ push していないコミットが残っていないか（`Your branch is ahead of 'origin/main'` などと出ていれば、プッシュ待ちと分かります）
+
+一方、**`git push` の後に `git status`** で「nothing to commit, working tree clean」と「Your branch is up to date with 'origin/main'」を確認できれば、プッシュまで正しく完了していることが分かります。どちらのタイミングでも、実務上は十分です。
+
 ---
 
 ## 🎯 練習問題
