@@ -17,8 +17,15 @@
 - `sukkiri_java_exercises/`: 「スッキリわかるJava」演習メモ
 - `GIT_WORKFLOW_GUIDE.md`: Git運用ルール・手順
 - `SECURITY_CHECK.md`: セキュリティ観点のチェック項目
-- `.gitignore`: 不要な
-ファイルを管理から外す設定
+- `SETUP.md`: **環境構築**（.project / .classpath / .settings が無いときの初期設定）
+- `.project.example`, `.classpath.example`, `.settings.example/`: 上記 SETUP 用のテンプレ（clone 直後にコピーして使用）
+- `.gitignore`: 不要なファイルを管理から外す設定
+
+## 開発・実行環境（このリポジトリの Run 時）
+
+- **JDK 25**（.classpath の JavaSE-25 に対応）。JDK 21 を使う場合は .classpath を JavaSE-21 に変更してください。
+- **Cursor / VS Code** と **Extension Pack for Java**
+- ワークスペースルートの `.vscode/settings.json` で `java.configuration.runtimes` を指定
 
 ## 学習内容
 - Java基礎文法の学習と実践

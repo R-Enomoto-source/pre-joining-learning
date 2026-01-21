@@ -419,3 +419,532 @@ c=10;
 | `a=10; b=10; c=10;` | 上と同じ |
 
 **代入の「式」としての値**が右へ伝わっていくので、`a = b = c = 10` のようなつなぎ方ができます。
+
+---
+
+### Resource leak（'&lt;unassigned Closeable value&gt;' is never closed）の意味
+
+ユーザー: どういう意味ですか？
+Resource leak: '<unassigned Closeable value>' is never closedJava(536871799)
+
+アシスタント:
+この警告の意味は次のとおりです。
+
+**Resource leak: '<unassigned Closeable value>' is never closed** は、
+
+- **Resource leak（リソースリーク）**  
+  - 開いたまま閉じられていない「リソース」がある可能性がある  
+- **`<unassigned Closeable value>`**  
+  - 変数に代入されていない `Closeable`（ここでは `Scanner`）が作られている  
+- **is never closed**  
+  - そのオブジェクトに対して `close()` が呼ばれず、終了処理がされていない  
+
+という指摘です。
+
+#### 該当箇所
+
+19行目です：
+
+```java
+name = new java.util.Scanner(System.in).nextLine();
+```
+
+ここで `new java.util.Scanner(System.in)` が作られています。  
+`Scanner` は `Closeable` を実装しており、内部的に `System.in` などのリソースを持っています。  
+これを変数に入れず、かつ `close()` も呼んでいないため、「閉じられないリソース」として警告されています。
+
+---
+
+#### なぜ問題になるか
+
+`Scanner` を閉じないと、
+
+- 入力ストリーム（ここでは `System.in`）が開いたまま残る
+- リソースの無駄や、長いプログラムでは不具合の原因になる
+- 静的解析ツールやIDEが「リソースリークの可能性」として警告する  
+
+学習用の短いプログラムでは、終了時にJVMが片付けるので大きな問題にはなりにくいですが、慣習として「開いたリソースは閉じる」ようにしておく方がよいです。
+
+---
+
+#### 修正例（try-with-resources）
+
+`Scanner` を変数に持ち、`try-with-resources` で自動的に閉じる書き方です。
+
+```java
+// 修正前
+name = new java.util.Scanner(System.in).nextLine();
+
+// 修正後（try-with-resources）
+try (java.util.Scanner scanner = new java.util.Scanner(System.in)) {
+    name = scanner.nextLine();
+}
+```
+
+このようにすると、`try` ブロックを出る時に `Scanner` の `close()` が自動で呼ばれ、警告も出なくなります。
+
+---
+
+### Resource leak の詳しい解説（用語・理由・解消）
+
+ユーザー: これの意味を教えてください
+Resource leak: '<unassigned Closeable value>' is never closed
+
+アシスタント:
+
+#### 「Resource leak: '<unassigned Closeable value>' is never closed」の意味
+
+この英文は、**閉じる必要のあるリソースを閉じていない** という警告です。分解すると次の通りです。
+
+---
+
+#### 1. Resource leak（リソースリーク）
+
+- ファイル、ネットワーク、キーボード入力など、**使ったあとに閉じる必要があるもの**を閉じずにいる状態
+- そのままにしておくと、無駄なリソースが残ったり、将来的に不具合の原因になり得る、という指摘
+
+---
+
+#### 2. \<unassigned Closeable value\>
+
+- **unassigned** ＝ 変数に代入されていない
+- **Closeable value** ＝ `close()` で閉じる必要があるオブジェクト（例：`Scanner`、`FileReader` など）
+- つまり「変数に入っていない、閉じるべきオブジェクト」という意味
+
+---
+
+#### 3. is never closed
+
+- **never closed** ＝ 一度も `close()` が呼ばれていない
+- そのオブジェクトが**ずっと開いたまま**になっている、という意味
+
+---
+
+#### まとめ（日本語にすると）
+
+> **「変数に代入していない Closeable なオブジェクトが、閉じられずに残っている（リソースリークの可能性）」**
+
+---
+
+#### よくある原因
+
+例えば次のようなコードで出ることがあります。
+
+```java
+// 変数に代入せず、その場で new して nextLine() だけ呼んでいる
+name = new java.util.Scanner(System.in).nextLine();
+```
+
+ここでは `Scanner` が作られていますが、
+
+- 変数に代入していない（unassigned）
+- どこからも `close()` を呼べない（never closed）
+
+ため、この警告になります。
+
+---
+
+#### 解消の仕方（イメージ）
+
+`Scanner` を変数に入れ、**try-with-resources** で閉じるようにすると解消されます。
+
+```java
+try (java.util.Scanner scanner = new java.util.Scanner(System.in)) {
+    name = scanner.nextLine();
+}
+```
+
+`try ( ... )` の中で宣言したリソースは、ブロックを抜けるときに自動で `close()` が呼ばれ、警告も出なくなります。
+
+---
+
+### Scanner 入力の日本語文字化けと原因特定のヒント
+
+ユーザー: @Run: exercise3 (32-39) こうなってしまいます
+原因特定のヒントを教えてください
+
+（実行結果の例）
+```
+ようこそ占いの館へ
+あなたの名前を入力してください
+湊雄輔  
+あなたの年齢を入力してください
+22
+占いの結果が出ました
+22歳の???Y??さん、あなたの運気番号は5です
+1:大吉 2:中吉 3:吉 4:凶
+```
+
+アシスタント:
+原因は、**キーボード入力（標準入力）の文字エンコーディングの不一致**です。
+
+---
+
+#### 状況の整理
+
+| 種類 | 表示 | 状態 |
+|------|------|------|
+| プログラム内の文字列（`WELCOME_MESSAGE` など） | 正しく表示 | ✅ |
+| **Scanner で読み取った `name`** | 「湊雄輔」→「???Y??」 | ❌ 文字化け |
+
+- ソースに書いた日本語は表示される  
+- **`Scanner` で読み取った日本語だけ**文字化けする  
+
+→ **「入力の読み取り方」と「ターミナルの入力の出し方」の文字コードが合っていない**と考えられます。
+
+---
+
+#### 原因のヒント（何がずれているか）
+
+1. **ターミナル（PowerShell）の文字コード**
+   - キーボードから送っている文字を、どのエンコーディング（UTF-8 / Shift_JIS など）で送っているか。
+
+2. **Java の `System.in` の文字コード**
+   - `Scanner` は `System.in` を **システムのデフォルト文字セット**（Windows なら MS932 / Shift_JIS が多い）で読むことが多い。
+   - ターミナルが UTF-8 で送っているのに、Java が Shift_JIS として解釈すると、日本語が「???」のように化けます。
+
+3. **「???」や「?c??」になる理由**
+   - バイト列を**別の文字コードとして解釈**した結果、その文字が存在せず、`?`（ replacement character）で置き換えられている。
+
+---
+
+#### 確かめ方のヒント
+
+1. **PowerShell のコードページ**
+   - コマンド: `chcp`
+   - 例: `65001` = UTF-8、`932` = 日本語(Shift_JIS)
+
+2. **Java が使っているデフォルト文字セット**
+   - プログラムの最初に  
+     `System.out.println(java.nio.charset.Charset.defaultCharset());`  
+   - を追加して実行し、表示された名前（例: `MS932`、`UTF-8`）を確認する。
+
+3. **ソースファイルの保存形式**
+   - `.java` が UTF-8 で保存されているか（エディタの「文字コード」や「エンコーディング」を確認）。
+
+---
+
+#### よくあるパターン（Windows + PowerShell）
+
+- ターミナル: **UTF-8**（`chcp 65001` や Windows 11 のデフォルト）
+- Java: **MS932（Shift_JIS）** をデフォルト使用  
+
+→ ターミナルが UTF-8 で「湊雄輔」を送り、Java が Shift_JIS として読むと、このような文字化けになります。
+
+---
+
+#### 次のステップ
+
+- 上記 1〜3 を確認して、  
+  - ターミナルが **UTF-8** か **Shift_JIS** か  
+  - Java の `defaultCharset()` が何か  
+  を比べてみてください。
+- それに合わせて、
+  - **オプションで `Scanner` に文字コードを指定する**（`Scanner(InputStream, String charsetName)` など）、あるいは
+  - **実行時に JVM のエンコーディングを合わせる**（`-Dfile.encoding=UTF-8` など）  
+  といった対処が必要になります。
+
+まずは `chcp` と `Charset.defaultCharset()` の結果を教えてもらえれば、具体的な修正案（`Scanner` の書き方や実行オプション）を出せます。
+
+---
+
+### 文字化けの修正方法（ターミナル CP932 と Java UTF-8 の不一致）
+
+ユーザー: @Run: exercise3 (40-51) コーディングは自分で行います
+修正方法を教えてください
+
+（確認結果の例：chcp → 932、Java の defaultCharset → UTF-8）
+
+アシスタント:
+コードはご自身で書かれる前提で、**修正の考え方と具体的なやり方**だけまとめます。
+
+---
+
+#### 1. 状況の整理
+
+| 対象 | 文字コード | 役割 |
+|------|------------|------|
+| **PowerShell（chcp 932）** | CP932（Shift_JIS） | 入力「湊雄輔」を CP932 のバイト列で Java に渡す |
+| **Java（defaultCharset = UTF-8）** | UTF-8 | `Scanner` がそのバイト列を **UTF-8 として** 解釈する |
+
+→ バイト列は CP932 なのに UTF-8 として読むため、`name` だけ文字化けする。
+
+---
+
+#### 2. 修正の方向性（2通り）
+
+##### 方法A: ターミナルを UTF-8 に合わせる（コード変更なし）
+
+- 実行**前**に PowerShell で:
+  ```
+  chcp 65001
+  ```
+- ターミナルが UTF-8 になるので、Java の UTF-8 と一致する。
+- **欠点**: 毎回 `chcp 65001` を打つか、プロファイルに書く必要がある。
+
+---
+
+##### 方法B: `Scanner` を CP932 に合わせる（推奨・コード修正）
+
+- ターミナルが **CP932（932）** のままなら、**入力読み取り時の文字コードを CP932 に合わせる**。
+
+**使う API:**
+
+```
+Scanner(InputStream source, String charsetName)
+```
+
+- 第2引数に `"MS932"` を指定する（CP932 / Windows-31J の Java での名前）。
+
+**修正対象の箇所:**
+
+- `new java.util.Scanner(System.in).nextLine()` をしている 2 箇所  
+  → ここで `System.in` を読む `Scanner` に `"MS932"` を渡す。
+
+**具体例（イメージ）:**
+
+```
+// 修正前
+name = new java.util.Scanner(System.in).nextLine();
+
+// 修正後（charset 指定）
+name = new java.util.Scanner(System.in, "MS932").nextLine();
+```
+
+`ageString` 用の `Scanner` も同様に、`System.in` と `"MS932"` を指定する形に変える。
+
+---
+
+#### 3. 実装上の注意
+
+1. **`Scanner` を 2 回 `new` している**
+   - 1 つの `Scanner` にまとめて、`nextLine()` を 2 回呼ぶ形にすると、リソース管理と「`"MS932"` の指定を 1 か所にできる」の両方に良い。
+
+2. **`"MS932"` の指定の仕方**
+   - `Scanner` の **コンストラクタの第2引数** に `"MS932"` を渡す。
+   - `Scanner` を変数に束縛して try-with-resources を使う場合は、その `Scanner` のコンストラクタに `"MS932"` を渡せばよい。
+
+3. **リソースリークの解消**
+   - 1 つの `Scanner` にまとめる場合、`try (Scanner sc = new Scanner(System.in, "MS932")) { ... }` のように書くと、`close` も一緒に扱える。
+
+---
+
+#### 4. まとめ
+
+- **原因**: ターミナル CP932 ↔ Java のデフォルト UTF-8 の不一致で、`Scanner` が入力を UTF-8 として読んでいる。
+- **コードで直すなら**: `Scanner` のコンストラクタで `"MS932"` を指定し、`System.in` を CP932 として読む。
+- **コードを変えないなら**: 実行前に `chcp 65001` でターミナルを UTF-8 にする。
+
+---
+
+### 同じ Scanner の Main で文字化けが起きない理由
+
+ユーザー: 下記で問題が発生していないのはなぜですか？
+
+```java
+public class Main { 
+  public static void main(String[] args) {
+    System.out.println("ようこそ占いの館へ");
+    System.out.print("あなたの名前を入力してください＞");
+    String name = new java.util.Scanner(System.in).nextLine();
+    System.out.print("あなたの年齢を入力してください＞");
+    String ageString = new java.util.Scanner(System.in).nextLine();
+    int age = Integer.parseInt(ageString);
+    int fortune = new java.util.Random().nextInt(4);
+    fortune++;
+    System.out.println("占いの結果が出ました！");
+    System.out.println(age + "歳の" + name + "さん、あなたの運気番号は" + fortune + "です");
+    System.out.println("1: 大吉　2:中吉　3:吉　4: 凶");
+  }
+} 
+```
+
+アシスタント:
+結論から言うと、**Main のコードには、exercise3 と違って「文字化けを防ぐ」ような仕組みはありません**。  
+同じ `Scanner(System.in)` を使っている以上、**同じ環境で日本語を入力すれば、同じように文字化けし得ます**。
+
+---
+
+#### 1. コード上の違い
+
+Main も exercise3 も、入力の読み方は同じです。
+
+```java
+String name = new java.util.Scanner(System.in).nextLine();
+```
+
+- どちらも `System.in` をそのまま使っている  
+- 文字コードを指定していない  
+- 文字化けを防ぐ特別な処理は入っていない  
+
+なので、**「この Main だから問題が起きない」という設計上の理由はありません。**
+
+---
+
+#### 2. 問題が起きていないように見える主な理由
+
+同じ現象（CP932 のターミナル vs UTF-8 の Java）なら、Main でも exercise3 でも理論上は同じはずです。  
+「Main では問題が発生していない」ように見えるなら、次のどれかが考えられます。
+
+##### (1) 入力に日本語（漢字など）を使っていない
+
+- 例: 名前を `"Yamada"` や `"Taro"` などの **半角英数字** だけで入力している  
+- 半角英数字は **UTF-8 と CP932 で同じバイト** のことが多い  
+- そのため、文字化けしない  
+
+「湊雄輔」「田中」のような **漢字・ひらがな・カタカナ** を入れたときにだけ、 CP932 と UTF-8 の解釈の違いで化けます。
+
+---
+
+##### (2) 実行環境が exercise3 と違う
+
+- **ターミナルのコードページ**  
+  - Main を実行するとき、すでに `chcp 65001` (UTF-8) になっている  
+- **実行のされ方**  
+  - 別の IDE・別の Run 設定で、  
+    `-Dfile.encoding=UTF-8` や `-Dfile.encoding=MS932` が Main のときだけ付いている  
+- **別のターミナル**  
+  - Windows ターミナルや WSL など、初期設定が UTF-8 の環境で Main だけ動かしている  
+
+このような「Main のときだけターミナル／JVM の文字コードが揃っている」場合、Main では化けず、exercise3 だけ化けて見えることがあります。
+
+---
+
+##### (3) 実際には化けているが気づいていない
+
+- 名前を「太郎」などの短い文字で試していて、化け方のパターンが違う  
+- サンプルとして「湊雄輔」のような文字を Main ではまだ試していない  
+
+という可能性もあります。
+
+---
+
+#### 3. 確かめ方
+
+Main でも **同じ条件** で試すと、exercise3 と同じ現象が出るか確認できます。
+
+1. **PowerShell で**  
+   - `chcp` → `932` であることを確認  
+2. **Main を実行**  
+   - 名前の入力で **「湊雄輔」や「田中」** のような漢字を入力  
+3. 表示結果を確認  
+   - `age + "歳の" + name + "さん"` の `name` の部分が  
+     - 「湊雄輔」「田中」のまま → そのときの環境では、Main はターミナル／JVM の設定が揃っている  
+     - 「???Y??」「?c??」のように化ける → exercise3 と **同じ原因**（CP932 と UTF-8 の不一致）で、Main にも **同じ問題がある** と考えてよいです。
+
+---
+
+#### 4. まとめ
+
+| 項目 | 内容 |
+|------|------|
+| Main のコード | 文字コードを指定しておらず、exercise3 と同じ `Scanner(System.in)` の使い方 |
+| 問題が起きない理由としてコードに由来するもの | **ない** |
+| 考えられる理由 | ① 半角英数字のみで試している　② Main と exercise3 で実行環境（chcp・JVM オプション・ターミナル）が違う　③ 漢字などでまだ試していない、もしくは気づいていない |
+
+「Main では問題が起きていない」というのは、**コードの違い**ではなく、**入力内容や実行環境の違い**による可能性が高い、という説明になります。
+
+---
+
+### Resource leak 警告への対処（習った範囲で close する）
+
+ユーザー: 文字化け以外は問題なく動いています
+下記の修正方法はまだ学んでいません
+
+```json
+[{
+	"resource": "/c:/Users/20171/IT_Learning/pre-joining-learning/sukkiri_java_exercises/Chapter2/exercise3.java",
+	"owner": "_generated_diagnostic_collection_name_#5",
+	"code": "536871799",
+	"severity": 4,
+	"message": "Resource leak: '<unassigned Closeable value>' is never closed",
+	"source": "Java",
+	"startLineNumber": 21,
+	"startColumn": 16,
+	"endLineNumber": 21,
+	"endColumn": 48,
+	"modelVersionId": 1527
+},{
+	"resource": "/c:/Users/20171/IT_Learning/pre-joining-learning/sukkiri_java_exercises/Chapter2/exercise3.java",
+	"owner": "_generated_diagnostic_collection_name_#5",
+	"code": "536871799",
+	"severity": 4,
+	"message": "Resource leak: '<unassigned Closeable value>' is never closed",
+	"source": "Java",
+	"startLineNumber": 23,
+	"startColumn": 21,
+	"endLineNumber": 23,
+	"endColumn": 53,
+	"modelVersionId": 1527
+}]
+```
+
+アシスタント:
+「try-with-resources や charset はまだ習っていない」前提で、**今の段階でできること**をまとめます。
+
+---
+
+#### 1. この警告について
+
+- **severity 4** = ヒント／情報レベルで、**コンパイルや実行は普通にできます**
+- 入門で「Scanner と nextLine()」をやっている段階では、**いったん無視して進めて問題ありません**
+- 公式の推奨（try-with-resources）は、その単元を習ってからで大丈夫です
+
+---
+
+#### 2. 「習った範囲だけ」で警告を消したい場合
+
+`Scanner` を変数に代入して、**使い終わったら `close()` を呼ぶ**と、この Resource leak の警告は出なくなります。
+
+- 使うもの: **変数**、**`new Scanner(System.in)`**、**`nextLine()`**、**`close()`**
+- try-with-resources や charset は使わない
+
+**やることのイメージ**
+
+1. `Scanner` を **1つだけ** 作り、変数（例: `sc`）に代入する  
+2. `name` と `ageString` の両方を、その `sc` の `nextLine()` で読む  
+3. 入力を使い終わったあと（`Integer.parseInt` の後あたり）で **`sc.close()`** を呼ぶ  
+
+---
+
+#### 3. 該当箇所の書き換えイメージ
+
+**現在（20～23行目あたり）**
+
+```java
+name = new java.util.Scanner(System.in).nextLine();
+System.out.println(AGE_IN);
+ageString = new java.util.Scanner(System.in).nextLine();
+```
+
+**変更の流れ**
+
+- 上の2行の `new java.util.Scanner(System.in)` をやめる  
+- その代わり、**その前**に  
+  `java.util.Scanner sc = new java.util.Scanner(System.in);`  
+  を1回だけ書く  
+- `name = ... nextLine()` と `ageString = ... nextLine()` の `...` の部分を、  
+  それぞれ `sc.nextLine()` に変える  
+- `age = Integer.parseInt(ageString);` の**後**に  
+  `sc.close();`  
+  を1行足す  
+
+（コード全体をここに書くと「自分で書く」の邪魔になるので、上のように「何をどう変えるか」だけにしています。）
+
+---
+
+#### 4. 注意点
+
+- `sc.close()` を実行すると、その `Scanner` が使っていた **`System.in` も閉じます**  
+- このプログラムでは、そのあと `System.in` を読み直さないので、**この程度の main なら `close()` して問題ありません**
+
+---
+
+#### 5. まとめ
+
+| 対応 | 内容 |
+|------|------|
+| **今は無視する** | 警告のままでも動く。try-with-resources を習うまでこのまま進めてよい |
+| **習った範囲で直す** | `Scanner` を1つにまとめて変数に代入し、`nextLine()` を2回使ったあと、`sc.close()` を1回呼ぶ |
+
+「まだ習っていない書き方」を使わずに、**変数・`Scanner`・`nextLine()`・`close()` だけ**で、この Resource leak の警告は消せます。
