@@ -20,8 +20,10 @@ public class StaticInitializerDemo {
         System.out.println("--- main開始 ---");
         System.out.println("クラス参照時点の value = " + StaticInitializerDemo.value);
         System.out.println("--- 1つ目のインスタンス生成 ---");
+        @SuppressWarnings("unused")
         StaticInitializerDemo a = new StaticInitializerDemo();
         System.out.println("--- 2つ目のインスタンス生成 ---");
+        @SuppressWarnings("unused")
         StaticInitializerDemo b = new StaticInitializerDemo();
         System.out.println("最終的な value = " + StaticInitializerDemo.value);
         System.out.println("--- main終了 ---");
