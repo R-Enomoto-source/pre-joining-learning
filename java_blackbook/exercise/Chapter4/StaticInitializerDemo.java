@@ -1,3 +1,4 @@
+package exercise.Chapter4;
 /**
  * static初期化子の動作確認用サンプル（学習用に作成）
  * クラスが初めて使われるときに static ブロックが1度だけ実行されることを示す。
