@@ -554,7 +554,7 @@ interface ExampleContract {
 
 ```java
 public interface Demo {
-    public void greet() {}  // 本体は空だが「何もしない実装」を持っている
+    public void greet() {}  // 何も処理しない空メソッドの実装
 }
 ```
 
@@ -569,8 +569,8 @@ public interface Demo {
 ※ Java 8 以降なら、**こう書けば OK（デフォルトメソッド）** です：
 
 ```java
-public interface Sample {
-    default void hello() {} // これは「何もしないデフォルト実装」
+public interface Greeting {
+    default void say() {} // 呼び出されても何も行わないデフォルト実装
 }
 ```
 
@@ -627,28 +627,28 @@ commonメソッドの処理内容をしっかりと書いておくというこ�
 上の図（インタフェースだけのパターン）はこういうイメージです：
 
 ```java
-interface A {
-    void common();
-    void individual();
+interface Task {
+    void runShared();
+    void runSpecific();
 }
 
-class B implements A {
-    public void common() {
-        // B も C も同じ共通処理を書くことになる
+class WorkerA implements Task {
+    public void runShared() {
+        // A と B で共通の処理
     }
 
-    public void individual() {
-        // B 独自処理
+    public void runSpecific() {
+        // WorkerA 独自の処理
     }
 }
 
-class C implements A {
-    public void common() {
-        // ここも B と同じ共通処理をコピペ
+class WorkerB implements Task {
+    public void runShared() {
+        // ここも WorkerA と同じ共通処理をそのまま書いている
     }
 
-    public void individual() {
-        // C 独自処理
+    public void runSpecific() {
+        // WorkerB 独自の処理
     }
 }
 ```
@@ -663,38 +663,38 @@ class C implements A {
 これは、**こう書き換えましょう、という提案**です：
 
 ```java
-interface A {
-    void common();
-    void individual();
+interface Task {
+    void runShared();
+    void runSpecific();
 }
 
-// A を実装した「抽象クラス」を 1 枚かませる
-abstract class AbstractA implements A {
+// Task を実装した「抽象クラス」を 1 枚かませる
+abstract class BaseTask implements Task {
 
     @Override
-    public void common() {
-        // ★ ここに B と C で共通の処理を書く
-        System.out.println("共通の処理");
+    public void runShared() {
+        // ★ ここに複数クラスで共通の処理を書く
+        System.out.println("共通の前処理");
     }
 
-    // individual はここではまだ決めない（抽象のまま）
+    // runSpecific はここではまだ決めない（抽象のまま）
     @Override
-    public abstract void individual();
+    public abstract void runSpecific();
 }
 
-// 具体クラス B
-class B extends AbstractA {
+// 具体クラス WorkerA
+class WorkerA2 extends BaseTask {
     @Override
-    public void individual() {
-        // B 独自の処理
+    public void runSpecific() {
+        // WorkerA2 独自の処理
     }
 }
 
-// 具体クラス C
-class C extends AbstractA {
+// 具体クラス WorkerB
+class WorkerB2 extends BaseTask {
     @Override
-    public void individual() {
-        // C 独自の処理
+    public void runSpecific() {
+        // WorkerB2 独自の処理
     }
 }
 ```
