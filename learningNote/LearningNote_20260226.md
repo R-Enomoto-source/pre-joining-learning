@@ -23,7 +23,7 @@ super.をつけなくてもよいのでしょうか？
 
 ```java
 public class Parent {
-    String name;   // または protected / public など（private ではない）
+    String name;   // 親クラスが持っているフィールド
 }
 ```
 
@@ -32,10 +32,10 @@ public class Parent {
 ```java
 public class Child extends Parent {
     Child() {
-        name = "java";
+        name = "Java";
     }
     void hello() {
-        System.out.println("hello, " + name);
+        System.out.println("greeting: " + name + "!");
     }
 }
 ```
@@ -534,13 +534,13 @@ void hello() {
 
 ```java
 // クラスの場合
-abstract class Sample {
-    abstract void hello();  // ← セミコロンで終わる。中カッコは書かない
+abstract class AbstractExample {
+    abstract void run();  // ← セミコロンで終わる。中カッコは書かない
 }
 
 // インタフェースの場合
-interface Sample {
-    void hello();           // ← これも中カッコなし、セミコロンで終わる
+interface ExampleContract {
+    void run();           // ← これも中カッコなし、セミコロンで終わる
 }
 ```
 
@@ -553,8 +553,8 @@ interface Sample {
 ### 2. インタフェースで `{}` を書いた場合
 
 ```java
-public interface Sample {
-    public void hello() {}  // ← これは「処理なしの実装を持つメソッド」
+public interface Demo {
+    public void greet() {}  // 本体は空だが「何もしない実装」を持っている
 }
 ```
 
