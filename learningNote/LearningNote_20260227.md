@@ -941,3 +941,470 @@ C implements B (Bを直接実装)
 ユーザー:
 そもそもsuper.sample();で呼べるものが違うということですね。
 クラス名.super.メソッド名とsuper.メソッド名の違いを初学者にも分かりやすく正確に教えてください
+
+アシスタント:
+`super.メソッド名()`と`インタフェース名.super.メソッド名()`の違いを説明します。
+
+アシスタント:
+## `super.メソッド名()`と`インタフェース名.super.メソッド名()`の違い
+
+### 基本的な違い
+
+| 構文 | 探す場所 | 使える場所 |
+|------|---------|-----------|
+| `super.メソッド名()` | **クラスの親クラス**（継承階層） | クラス内のみ |
+| `インタフェース名.super.メソッド名()` | **インタフェースのdefaultメソッド** | そのインタフェースを直接実装しているクラス内のみ |
+
+---
+
+## 1. `super.メソッド名()`：クラスの継承階層をたどる
+
+### 基本ルール
+
+```java
+class Parent {
+    void method() {
+        System.out.println("Parent");
+    }
+}
+
+class Child extends Parent {
+    void method() {
+        super.method();  // ← Parentクラスのmethod()を呼ぶ
+        System.out.println("Child");
+    }
+}
+```
+
+**動作：**
+- `super.method()`は、**クラスの親クラス**（`Parent`）の`method()`を探す
+- クラスの継承階層を上にたどる
+
+### 具体例
+
+```java
+class GrandParent {
+    void method() {
+        System.out.println("GrandParent");
+    }
+}
+
+class Parent extends GrandParent {
+    void method() {
+        super.method();  // GrandParentのmethod()を呼ぶ
+        System.out.println("Parent");
+    }
+}
+
+class Child extends Parent {
+    void method() {
+        super.method();  // Parentのmethod()を呼ぶ
+        System.out.println("Child");
+    }
+}
+```
+
+**実行結果：**
+```
+GrandParent
+Parent
+Child
+```
+
+### インタフェースには使えない
+
+```java
+interface A {
+    default void method() {
+        System.out.println("A");
+    }
+}
+
+class B implements A {
+    void method() {
+        super.method();  // ← コンパイルエラー！
+        // superはクラスの親を探すので、Objectクラスを探す
+        // Objectにはmethod()がないのでエラー
+    }
+}
+```
+
+**なぜエラー？**
+- `super`は**クラスの親クラス**を探す
+- `B`の親クラスは`Object`（明示的に継承していない場合）
+- `Object`には`method()`がないので、コンパイルエラー
+
+---
+
+## 2. `インタフェース名.super.メソッド名()`：インタフェースのdefaultメソッドを呼ぶ
+
+### 基本ルール
+
+```java
+interface A {
+    default void method() {
+        System.out.println("A");
+    }
+}
+
+class B implements A {
+    void method() {
+        A.super.method();  // ← Aインタフェースのdefaultメソッドを呼ぶ
+        System.out.println("B");
+    }
+}
+```
+
+**動作：**
+- `A.super.method()`は、**Aインタフェースのdefaultメソッド**を呼ぶ
+- インタフェースの継承階層をたどる
+
+### 重要なルール：直接実装している型からしか呼べない
+
+```java
+interface A {
+    default void method() {
+        System.out.println("A");
+    }
+}
+
+interface B extends A {
+    // Aのmethod()を継承
+}
+
+class C implements B {
+    void method() {
+        A.super.method();  // ← コンパイルエラー！
+        // CはAを直接実装していない（Bを実装している）のでエラー
+        
+        B.super.method();  // ← OK！
+        // CはBを直接実装しているので、B.super.method()は呼べる
+        // Bにはmethod()の実装がないので、継承チェーンをたどってAのmethod()が呼ばれる
+    }
+}
+```
+
+**なぜ`A.super.method()`がエラー？**
+- `インタフェース名.super.メソッド名()`は、**そのインタフェースを直接実装している型**からしか呼べない
+- `C`は`B`を直接実装しているが、`A`は直接実装していない
+- したがって、`C`から`A.super.method()`は呼べない
+
+**なぜ`B.super.method()`はOK？**
+- `C`は`B`を直接実装しているので、`B.super.method()`は呼べる
+- `B`には`method()`の実装がないので、継承チェーンをたどって`A`の`method()`が呼ばれる
+
+---
+
+## 3. 両方を使う例：クラス継承とインタフェース実装の組み合わせ
+
+```java
+class Parent {
+    void method() {
+        System.out.println("Parent class");
+    }
+}
+
+interface A {
+    default void method() {
+        System.out.println("A interface");
+    }
+}
+
+class Child extends Parent implements A {
+    void method() {
+        super.method();        // ← Parentクラスのmethod()を呼ぶ
+        A.super.method();      // ← Aインタフェースのdefaultメソッドを呼ぶ
+        System.out.println("Child");
+    }
+}
+```
+
+**実行結果：**
+```
+Parent class
+A interface
+Child
+```
+
+**ポイント：**
+- `super.method()`はクラスの親（`Parent`）を探す
+- `A.super.method()`はインタフェース（`A`）のdefaultメソッドを呼ぶ
+- 両方とも使える（ただし、メソッド名が同じ場合は注意が必要）
+
+---
+
+## 4. 問題のコードでの動作
+
+```java
+public interface A {
+    default void sample() {
+        System.out.println("Hello");
+    }
+}
+
+public interface B extends A {
+    // 空、Aのsample()を継承
+}
+
+public class C implements B {
+    @Override
+    public void sample() {
+        super.sample();        // ← エラー！Objectクラスを探すが、sample()がない
+        A.super.sample();      // ← エラー！CはAを直接実装していない
+        B.super.sample();      // ← OK！CはBを直接実装している
+        System.out.println("Java");
+    }
+}
+```
+
+### 各構文の動作
+
+| 構文 | 探す場所 | 結果 |
+|------|---------|------|
+| `super.sample()` | `Object`クラス（`C`の親クラス） | エラー（`Object`に`sample()`がない） |
+| `A.super.sample()` | `A`インタフェース | エラー（`C`は`A`を直接実装していない） |
+| `B.super.sample()` | `B`インタフェース | OK（`C`は`B`を直接実装している） |
+
+### `B.super.sample()`の動作
+
+1. `B.super.sample()`を呼ぶ
+2. `B`には`sample()`の実装がない
+3. `B`は`A`を継承しているので、継承チェーンをたどる
+4. `A`の`sample()`が呼ばれる
+5. 「Hello」が表示される
+
+---
+
+## 5. まとめ表
+
+| 項目 | `super.メソッド名()` | `インタフェース名.super.メソッド名()` |
+|------|---------------------|-------------------------------------|
+| **探す場所** | クラスの親クラス（継承階層） | インタフェースのdefaultメソッド |
+| **使える場所** | クラス内のみ | そのインタフェースを直接実装しているクラス内のみ |
+| **継承階層** | クラスの継承階層を上にたどる | インタフェースの継承階層をたどる |
+| **例** | `super.method()` | `A.super.method()` |
+
+---
+
+## 6. 覚えておくべきポイント
+
+### ポイント1：`super`はクラスの親を探す
+
+```java
+class Child extends Parent {
+    void method() {
+        super.method();  // Parentクラスを探す
+    }
+}
+```
+
+### ポイント2：`インタフェース名.super`はインタフェースのdefaultメソッドを呼ぶ
+
+```java
+interface A {
+    default void method() { }
+}
+
+class B implements A {
+    void method() {
+        A.super.method();  // Aインタフェースのdefaultメソッドを呼ぶ
+    }
+}
+```
+
+### ポイント3：直接実装している型からしか呼べない
+
+```java
+interface A { }
+interface B extends A { }
+class C implements B {
+    void method() {
+        A.super.method();  // エラー！CはAを直接実装していない
+        B.super.method();  // OK！CはBを直接実装している
+    }
+}
+```
+
+### ポイント4：クラスとインタフェースは別物
+
+```java
+class Parent { }
+interface A { }
+class Child extends Parent implements A {
+    void method() {
+        super.method();    // Parentクラスを探す
+        A.super.method();  // Aインタフェースを探す
+        // 両方とも使える（別々の階層）
+    }
+}
+```
+
+---
+
+## 7. よくある間違い
+
+### 間違い1：インタフェースで`super`を使う
+
+```java
+interface A {
+    default void method() {
+        super.method();  // ← エラー！インタフェースには親クラスがない
+    }
+}
+```
+
+**正解：** インタフェース内では`super`は使えない
+
+### 間違い2：間接的に実装しているインタフェースの`super`を呼ぶ
+
+```java
+interface A { }
+interface B extends A { }
+class C implements B {
+    void method() {
+        A.super.method();  // ← エラー！CはAを直接実装していない
+    }
+}
+```
+
+**正解：** 直接実装しているインタフェース（`B`）の`super`を使う
+
+```java
+B.super.method();  // OK！
+```
+
+### 間違い3：クラスでインタフェースの`super`を使わずに`super`を使う
+
+```java
+interface A {
+    default void method() { }
+}
+
+class B implements A {
+    void method() {
+        super.method();  // ← エラー！Objectクラスを探すが、method()がない
+    }
+}
+```
+
+**正解：** インタフェースの`super`を使う
+
+```java
+A.super.method();  // OK！
+```
+
+---
+
+**核心的な違い：**
+- `super.メソッド名()`はクラスの親クラスを探す
+- `インタフェース名.super.メソッド名()`はインタフェースのdefaultメソッドを呼ぶ
+- これらは別の階層を探すため、両方とも使える場合がある
+
+ユーザー:
+B.super.sample()は、Bの親クラスのsampleメソッドを呼び出しているんですね
+A.super.sample()は、Aの親クラスのsamleメソッドは存在しないし、2つ内側にあるものにはそもそもアクセスできない、ということですか？
+
+アシスタント:
+いいところに気づいていますが、用語と考え方を少しだけ修正した方がよいです。
+
+### 1. B.super.sample() は「Bの“親クラス”」ではない
+
+この例ではすべて**インタフェース**です。
+
+```java
+public interface A {
+    default void sample() { System.out.println("Hello"); }
+}
+
+public interface B extends A { }
+
+public class C implements B {
+    @Override
+    public void sample() {
+        B.super.sample();      // ここ
+        System.out.println("Java");
+    }
+}
+```
+
+- `B.super.sample()` が探すのは  
+  **「B が継承しているインタフェース（= super インタフェース）にある default メソッド」** です。
+- `B` 自身には `sample()` の実装がないので、`B` の super インタフェースである **`A` の default `sample()`** が呼ばれます。
+
+つまり：
+
+> **B.super.sample() = 「B 経由で A の default sample() を呼ぶ」**
+
+であって、クラスの「親クラス」を呼んでいるわけではありません。
+
+### 2. A.super.sample() がダメな理由
+
+```java
+public class C implements B {
+    @Override
+    public void sample() {
+        A.super.sample();  // コンパイルエラー
+    }
+}
+```
+
+- ルール：`X.super.m()` は、「**X を “直接” implements/extends している型**」からしか呼べません。
+- `C` は `implements B` なので、**直接関係があるのは B だけ**。
+- `A` とは「B を挟んだ間接的な関係」なので、`C` から `A.super.sample()` は呼べません。
+
+あなたの言う
+
+> 「2つ内側にあるものにはそもそもアクセスできない」
+
+という感覚はほぼ合っていますが、より正確には：
+
+- **「直接 implements/extends していないインタフェースの `X.super` は使えない」**
+- だから `C` から使えるのは `B.super.sample()` だけ  
+  → その結果として `A` の default が見つかる、という流れです。
+
+ユーザー:
+ClassCは継承しているのがObjectだから、継承先としてそれを読んでいると判断されるんですね。
+implementsは内部的に継承とは別扱いということでしょうか？
+
+ユーザー:
+これが良く分かりません。
+抽象クラスを実装している具象クラスをインスタンス化した場合、抽象クラスのメンバと具象クラスで新規作成やオーバーライドされたメンバが含まれていると私は理解しています。
+具象クラスをインスタンス化した具象インスタンスが抽象インスタンスをそのまま持っているというのがイメージできません。
+画像の説明は私の言っていることと同じことを言っているのでしょうか？
+
+ユーザー:
+以下の条件で、チャットのやり取りをMarkdownファイルに書き起こしてください。
+【出力先】
+pre-joining-learning/learningNote/LearningNote_20260227.md
+（YYYYMMDDは当日の日付）
+【形式（見出し階層を厳守）】
+1) ファイル先頭の見出し
+# LearningNote YYYY-MM-DD
+2) セッションログの見出し
+## セッションログ（ユーザー入力＋回答）
+3) 各やりとりのタイトル
+### タイトル（内容を読み込んで相応しいタイトルをつける）
+4) タイトル内の小見出しは #### 以降を使用（# / ## / ### を使わない）
+【記載ルール】
+「ユーザー:」「アシスタント:」を交互に並べる
+チャットで出力された内容は省略せず、そのまま貼り付ける
+コードブロック、箇条書き、改行などもそのまま保持する
+途中で「要約」「簡略化」「言い換え」をしない
+各やりとりの前に、内容にふさわしいタイトルを付ける
+すでに中身がある場合はその最後に追加する形に
+【タイトル付けの例】
+配列の再代入と final の挙動
+equals と == の違い（配列・List）
+JVMメモリ（スタック/ヒープ/GC）の理解
+拡張for文（for-each）の基本と注意点
+コンストラクタとメソッドの違い
+2次元配列の走査と出力
+【出力例】
+# LearningNote 2026-01-16
+
+## セッションログ（ユーザー入力＋回答）
+
+### タイトル（内容を読み込んで相応しいタイトルをつける）
+ユーザー: ...
+アシスタント:
+...（ここにチャットの本文をそのまま）
