@@ -57,4 +57,4 @@
     まずcatchブロックを実行しないと、例外処理が記述および実行できない。そして、finallyブロックが先に来てしまうと、clozeしていなかった場合別のエラーが発生してしまうため、確実にclozeさせるためにclozeブロックがfinallyブロックより先に来るべき
 25. B
     tryブロックでエラーが発生して、Exception-catchブロックに行き、そこでBと表示されるため。
-    colozeでの
+    ただ自動でcolozeするときの、throw new RuntimeException("trouble");がどうなるのかが分からない。
