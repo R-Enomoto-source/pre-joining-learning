@@ -881,7 +881,7 @@ public static void main(String[] args) {
 
 ---
 
-### トップレベルクラス・インナークラス・ローカルクラスの違い
+### クラス・インナークラス・ローカルクラスの違い
 
 ユーザー:
 トップ、インナー、ローカル、それぞれのレベルのクラスを具体的に分かりやすく正確に教えてください
@@ -891,7 +891,7 @@ public static void main(String[] args) {
 
 Java では、クラスは大きく **3つの「いる場所（レベル）」** で登場します。
 
-1. **トップレベルクラス**（top-level class）  
+1. **クラス**（top-level class）  
 2. **インナークラス（メンバークラス）**（inner / member class）  
 3. **ローカルクラス**（local class）
 
