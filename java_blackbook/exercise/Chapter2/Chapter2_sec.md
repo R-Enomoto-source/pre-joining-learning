@@ -23,7 +23,7 @@ replaceメ ソッ ドの引数は、char型 かCharSequence型 のうち、ど�
 15. F　
 16. A
 17. A
-18. B
+18. B　
 19. D
 20. 3
 21. C
