@@ -2,7 +2,7 @@
 
 本章は、採点結果の **「不正解から整理した弱点学習領域一覧」**（`local_problems/scoring_result/Chapter2_ScoringResult_1once.md`）と、公式の **解答・解説**（`local_problems/answers/Chapter2_answers.md`）に基づいて整理した弱点解説です。各項目は **不正解となった設問番号** を必ず紐づけています。
 
-以下の **例となるコード** は理解用の断片です。複数の `Main` が出てくる場合は、ファイルを分けるか、`jshell` で断片だけ試すなどしてコンパイルしてください。
+以下の **例となるコード** は理解用の断片です。**本番問題の字面・選択肢と重ならないよう、別の単語や数値に置き換えています**。複数の `public class` が出てくる場合はファイルを分けるか、`jshell` で断片だけ試してください。
 
 ---
 
@@ -21,13 +21,13 @@
 
 ```java
 // 8 進：先頭 0。各桁は 0〜7 のみ（8, 9 はコンパイルエラー）
-// int bad = 0827;
+// int invalidOct = 0951; // 9 を含むので NG の例（値は架空）
 
-// これらは問題文の他の選択肢イメージとして有効な例
-int dec = 267;           // 10 進（接頭辞なし）
-int oct = 0413;          // 8 進
-int hex = 0x10B;         // 16 進
-int bin = 0b100001011;   // 2 進
+// 接頭辞の見分け用（数値そのものはオリジナル）
+int dec = 440;            // 10 進
+int oct = 077;            // 8 進（0〜7 の桁だけ）
+int hex = 0x2F4;          // 16 進
+int bin = 0b101101;       // 2 進
 ```
 
 ### 陥りやすい罠
@@ -55,17 +55,17 @@ int bin = 0b100001011;   // 2 進
 
 ```java
 // OK：先頭末尾・記号の前後に _ が来ていない
-int a = 123_456_789;
-int b = 5_______2;
-byte g = 0b0_1;
-int h = 0_52;
+int yearChunk = 20_26_05_07;
+long big = 1_000_000L;
+float piish = 3.14_15f;
+int bin = 0b1010_1100;
 
 // NG 例（コンパイルエラー）
-// int c = _123_456_789;   // 先頭
-// int d = 123_456_789_;   // 末尾
-// float e = 3_.1415F;     // '.' の前後
-// long f = 999_99_9999_L; // 'L' の前後（仕様上 NG パターン）
-// int i = 0x_52;           // 0x と数字の間
+// int badHead = _404;
+// int badTail = 404_;
+// float badDot = 2_.71f;
+// long badL = 100_L;
+// int badHex = 0x_FF; // x と桁の間（環境により NG パターンとして覚える）
 ```
 
 ### 陥りやすい罠
@@ -93,14 +93,15 @@ int h = 0_52;
 ### 例となるコード
 
 ```java
-// OK
-int $a = 100;
-int b_ = 200;
-int _0 = 300;
+// OK（記号は $ と _、英字開始などルール内）
+int $session = 1;
+int user_name = 2;
+int _temp = 3;
 
-// NG（識別子として解釈できない）
-// int ${d} = 400;
-// int g.a = 700;
+// NG（識別子ルール違反）
+// int 2nd = 4;        // 数字始まり
+// int a.b = 5;        // '.' は識別子に含めない
+// int n{1} = 6;       // '{}' は使えない
 ```
 
 ### 陥りやすい罠
@@ -129,17 +130,17 @@ int _0 = 300;
 ### 例となるコード
 
 ```java
-// 正しい例（設問の正解イメージ）
-int[][] a = {{1, 1}, {2, 2}};
-short b = (short) 'A';
-boolean d = (10 == 10);
-int f = 12_34;
+// 合法例（パターン理解用。数値・型は架空でよい）
+int[][] grid = {{7, 7}, {8, 8}};
+short code = (short) 'Z';
+boolean flag = (-1 < 0);
+int pretty = 99_88_77;
 
-// 誤りの例
-// byte c1 = 10;
-// char c2 = c1;          // byte → char は暗黙変換不可
-// float e = 1.99;        // 1.99 は double リテラル
-// String g = 'a';        // char を String に代入不可
+// 違法例
+// byte lo = 20;
+// char ch = lo;           // byte → char は暗黙不可
+// float r = 3.14159;      // double リテラルを float に
+// String label = 'Q';     // char を String に
 ```
 
 ### 陥りやすい罠
@@ -168,17 +169,17 @@ int f = 12_34;
 ```java
 public class Demo {
     public static void main(String[] args) {
-        String str = "hoge, world.";
-        hello(str);
-        System.out.println(str); // hoge, world.（中身は変わらない）
+        String line = "DRAFT: ready.";
+        sanitize(line); // 呼び出し側の line は変わらない
+        System.out.println(line);
 
-        String s2 = "hoge, world.";
-        s2 = s2.replaceAll("hoge", "hello"); // 戻り値を代入すれば別インスタンスを参照
-        System.out.println(s2);               // hello, world.
+        String copy = "DRAFT: ready.";
+        copy = copy.replace("DRAFT", "FINAL"); // 戻り値を受け取った参照だけ更新
+        System.out.println(copy);
     }
 
-    static void hello(String msg) {
-        msg.replaceAll("hoge", "hello"); // 戻り値を破棄している＝msg の参照先は不変
+    static void sanitize(String text) {
+        text.replace("DRAFT", "FINAL"); // 破棄＝内部の実体は immutable のまま
     }
 }
 ```
@@ -210,14 +211,15 @@ API は理解できていても **選択肢の記号を取り違える**（メ�
 ### 例となるコード
 
 ```java
-String str = "abcde";
+// 長さ 5 の英小文字だけの並び（中身は任意でよい）
+String word = "klmno";
 
-// 問12：部分文字列 "abcdef" は存在しない → -1
-System.out.println(str.indexOf("abcdef")); // -1
+// 存在しないより長いパターン → -1
+System.out.println(word.indexOf("klmnop")); // -1
 
-// 問20："bcd" の開始位置はインデックス 1（b の位置）。終了インデックスではない。
-StringBuilder sb = new StringBuilder("abcde");
-System.out.println(sb.indexOf("bcd")); // 1
+// 中盤 3 文字の「開始インデックス」を返す（ここでは 1）
+StringBuilder buf = new StringBuilder(word);
+System.out.println(buf.indexOf("lmn")); // 1（終端 index ではない）
 ```
 
 ### 陥りやすい罠
@@ -228,7 +230,7 @@ System.out.println(sb.indexOf("bcd")); // 1
 ### 復習チェック
 
 - [ ] 欠パターンは常に `-1`  
-- [ ] `bcd` が 0〜4 のどこで始まるか手で指で追える  
+- [ ] 部分文字列の「先頭インデックス」を 0 から数えて指で追える  
 
 ---
 
@@ -247,20 +249,20 @@ System.out.println(sb.indexOf("bcd")); // 1
 ### 例となるコード
 
 ```java
-// 設問：文字列で初期化した StringBuilder の capacity()
-StringBuilder sb = new StringBuilder("abcde");
-System.out.println(sb.length());    // 5（文字列の長さ）
-System.out.println(sb.capacity()); // 21（概ね「長さ + 16」）
+// 長さ len の文字列で初期化したとき capacity ≒ len + 16（説明の定番式）
+String seed = "chunk"; // len == 5 の例。語は任意でよい
+StringBuilder sb = new StringBuilder(seed);
+System.out.println(sb.length());     // 5
+System.out.println(sb.capacity());     // 21 前後のイメージ（JDK 実装参照）
 
-// 引数なしコンストラクタは別の初期容量（典型例として 16）
-StringBuilder empty = new StringBuilder();
-System.out.println(empty.length());    // 0
-System.out.println(empty.capacity());  // 16（実装依存の点は仕様・JDK で確認）
+StringBuilder blank = new StringBuilder();
+System.out.println(blank.length());    // 0
+System.out.println(blank.capacity());   // 典型値 16（実装依存）
 ```
 
 ### 陥りやすい罠
 
-「5+16」と計算メモは正しいのに **選択肢 B（5）** など **表示値と記号の対応ミス**。
+計算結果（例：**21**）までは合っていても **解答記号だけ別の選択肢になる**対応ミス。
 
 ### 復習チェック
 
@@ -319,10 +321,12 @@ String classic = "1行目\n\"引用\"\n2行目\n";
 ```java
 // OK：開始 """ の直後に改行がある
 String ok = """
-    this is textblock sample.""";
+    line-one
+    line-two""";
 
-// NG：開始 """ の直後にすぐ本文（コンパイルエラー）
-// String ng = """this is textblock sample.""";
+// NG：開始直後に本文を続ける（コンパイルエラー）
+// String ng = """no newline here
+// continues...""";
 ```
 
 ### 陥りやすい罠
@@ -348,14 +352,13 @@ String ok = """
 ### 例となるコード
 
 ```java
-// 共通の左インデント（最も浅い行）が取り除かれ、相対だけが残るイメージ
+// 左端そろえ：最もインデントが浅い行を基準に、各行の先頭空白が削られる
 String str = """
-        A
-    B
-C
+        East
+    North
+Pole
 """;
-// 実際のスペース量はソースのインデントに依存。公式の問23と同様に「最も浅い行」を基準にストリップ
-System.out.println(str);
+System.out.println(str); // 実行して相対位置だけを観察するのが定着に効く
 ```
 
 ### 陥りやすい罠
@@ -381,20 +384,20 @@ System.out.println(str);
 ### 例となるコード
 
 ```java
-// 設問の骨格：intern() はプール上の同一表現に揃い、== が true になりやすい
-String a = "abc";
-String b = new String(a);
-int count = 0;
-if (a.intern() == "abc") {
-    count++;
+// intern() は同一内容ならプール側の参照へ寄せ、== が true になりやすい
+String left = "ping";
+String right = new String(left);
+int hits = 0;
+if (left.intern() == "ping") {
+    hits++;
 }
-if (b.intern() == "abc") {
-    count++;
+if (right.intern() == "ping") {
+    hits++;
 }
-if (a.intern() == b.intern()) {
-    count++;
+if (left.intern() == right.intern()) {
+    hits++;
 }
-System.out.println(count); // 3
+System.out.println(hits); // 3
 ```
 
 ### 陥りやすい罠
@@ -486,25 +489,25 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 ### 例となるコード
 
 ```java
-// NG（CE）：左辺 1 次元に 2 次元を代入
-// int[] a = new int[2][3];
+// NG：次元の不一致
+// int[] row = new int[3][2];
 
-// NG（CE）：要素数に double
-// int[] b = new int[2.3];
+// NG：要素数に浮動小数
+// int[] bad = new int[4.0];
 
 // OK
-int[] c = new int[2 * 3];
-int x = 2, y = 3;
-int[] d = new int[x * y];
-int[][] e = new int[2][];
+int[] ok1 = new int[5 + 5];
+int m = 3, n = 4;
+int[] ok2 = new int[m * n];
+int[][] ok3 = new int[3][];
 
-// NG（CE）：1 次元目を空にして 2 次元目だけ指定
-// int[][] f = new int[][3];
+// NG：2 次元目だけ先に長さ指定
+// int[][] bad2 = new int[][4];
 ```
 
 ### 陥りやすい罠
 
-**E（`new int[2][]`）を誤ってエラー扱い**。複数選択の取りこぼし。
+**`new int[n][]` が合法**なのに、「欠けているのでエラー」と誤って除外する。複数選択の取りこぼし。
 
 ### 復習チェック
 
@@ -525,22 +528,18 @@ int[][] e = new int[2][];
 ### 例となるコード
 
 ```java
-class Item {
-    String name;
-    int price = 100;
+class Notebook {
+    String title;
+    int pages = 50;
 }
 
-public class Main {
+class Shelf {
     public static void main(String[] args) {
-        Item[] items = new Item[3]; // 要素は null のまま（Item は new していない）
-        // int total = 0;
-        // for (int i = 0; i < items.length; i++) {
-        //     total += items[i].price; // NullPointerException
-        // }
+        Notebook[] slots = new Notebook[2]; // スロットだけ。中身はまだ null
+        // System.out.println(slots[0].pages); // NullPointerException
 
-        // 正しくは要素にインスタンスを代入してからアクセス
-        for (int i = 0; i < items.length; i++) {
-            items[i] = new Item();
+        for (int i = 0; i < slots.length; i++) {
+            slots[i] = new Notebook(); // 参照型配列は要素を自分で new する
         }
     }
 }
@@ -571,22 +570,22 @@ public class Main {
 ### 例となるコード
 
 ```java
-// NG：要素数と初期化子の併記
-// int[] a = new int[2]{ 2, 3 };
+// NG：サイズ指定と {} を同時に
+// int[] bad = new int[3]{ 9, 8, 7 };
 
-// OK：空配列
-int[][] b = {};
+// OK：二次元の {}（空でも可）
+int[][] grid = {};
 
-// OK：次元を明示した空配列
-int[][] c = new int[][]{};
+// OK：new で次元だけ明示した空二次元
+int[][] plane = new int[][]{};
 
-// OK：宣言と分離するときは要素数を [] で明示（初期化子だけは不可）
-int[] d;
-d = new int[]{ 2, 3 };
+// OK：宣言と代入を分けるときはこちらの形
+int[] xs;
+xs = new int[]{ 40, 41 };
 
-// NG：初期化子だけを後から代入
-// int[] e;
-// e = { 2, 3 };
+// NG：単独の {} は宣言と一緒にしか書けない
+// int[] ys;
+// ys = { -1, -2 };
 ```
 
 ### 陥りやすい罠
@@ -612,15 +611,14 @@ d = new int[]{ 2, 3 };
 ### 例となるコード
 
 ```java
-// 1 行目配列の一部が null のまま length に触れると NPE
-String[][] array = {
-    { "A", "B" },
+String[][] rows = {
+    { "aa", "bb" },
     null,
-    { "C", "D", "E" },
+    { "cc", "dd", "ee" },
 };
-// int total = 0;
-// for (String[] tmp : array) {
-//     total += tmp.length; // tmp が null のとき NullPointerException
+// int sum = 0;
+// for (String[] row : rows) {
+//     sum += row.length; // row が null の行で NPE
 // }
 ```
 
@@ -647,19 +645,19 @@ String[][] array = {
 ### 例となるコード
 
 ```java
-interface A {}
+interface Remote {}
 
-abstract class B implements A {}
+abstract class Device implements Remote {}
 
-class C extends B {}
+class Phone extends Device {}
 
-class D extends C {}
+class Tablet extends Phone {}
 
-public class Main {
+public class Desk {
     public static void main(String[] args) {
-        A[] array = { new C(), null, new D() };
-        Object[] objArray = array; // スーパータイプの配列への代入は暗黙変換で可
-        // ここで読まなければ実行時例外は出ない典型的例
+        Remote[] dock = { new Phone(), null, new Tablet() };
+        Object[] any = dock; // 配列の副次型 → Object[]
+        // 未使用・未キャストならここでは静かに終わるだけ、という例もある
     }
 }
 ```
@@ -691,12 +689,11 @@ import java.util.ArrayList;
 
 public class Demo {
     public static void main(String[] args) {
-        ArrayList<String> list = new ArrayList<>();
-        list.add(null);   // OK：null を格納できる
-        list.add("A");
-        list.add("A");    // OK：重複可
-        list.add(1, "B"); // OK：位置指定の add も可能（別設問で境界に注意）
-        // 単一スレッド前提の高速な動的配列／スレッドセーフではない、と整理
+        ArrayList<String> bag = new ArrayList<>();
+        bag.add(null);
+        bag.add("alpha");
+        bag.add("alpha");     // 重複しても可
+        bag.add(1, "beta");   // 挿入位置の add も可能（境界は別の復習で）
     }
 }
 ```
@@ -726,14 +723,14 @@ public class Demo {
 ```java
 import java.util.ArrayList;
 
-public class Main {
+public class MixBox {
     public static void main(String[] args) {
-        ArrayList list = new ArrayList<>(); // 左辺が生型 → 実質 Object 相当の要素
-        list.add("A");
-        list.add(10);    // Integer にボクシング
-        list.add('B');   // Character にボクシング
-        for (Object obj : list) {
-            System.out.print(obj); // A10B
+        ArrayList bag = new ArrayList<>(); // 生型：要素は Object 想定で受け止められる
+        bag.add("X");
+        bag.add(99);
+        bag.add('Z');
+        for (Object one : bag) {
+            System.out.print(one); // X99Z（数と文字はボクシングされて格納）
         }
     }
 }
@@ -764,12 +761,12 @@ public class Main {
 ```java
 import java.util.ArrayList;
 
-public class Main {
+public class SlotDemo {
     public static void main(String[] args) {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("A"); // size == 1。有効な挿入位置は 0 または 1 の「間」のみのイメージ
-        // list.add(2, "B"); // IndexOutOfBoundsException（Index: 2, Size: 1）
-        list.add(1, "B"); // OK：末尾に相当する隙間への挿入
+        ArrayList<String> queue = new ArrayList<>();
+        queue.add("only"); // size == 1 のとき index 2 は「まだ存在しない隙間」
+        // queue.add(2, "tooFar"); // IndexOutOfBoundsException
+        queue.add(1, "tail"); // 0 と 1 の間への挿入なら OK
     }
 }
 ```
@@ -799,37 +796,38 @@ public class Main {
 ```java
 import java.util.ArrayList;
 
-class Item {
-    private final String name;
-    private final int price;
+/** 金額ではなく「都市」だけで等価判定する例（試験問題の型の比喩） */
+class Ticket {
+    private final String city;
+    private final int yen;
 
-    Item(String name, int price) {
-        this.name = name;
-        this.price = price;
+    Ticket(String city, int yen) {
+        this.city = city;
+        this.yen = yen;
     }
 
-    String getName() {
-        return name;
+    String city() {
+        return city;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Item other) {
-            return name.equals(other.name); // price は比較しない
+        if (obj instanceof Ticket t) {
+            return city.equals(t.city); // 金額は見ない
         }
         return false;
     }
 }
 
-public class Main {
+class Ledger {
     public static void main(String[] args) {
-        ArrayList<Item> list = new ArrayList<>();
-        list.add(new Item("A", 100));
-        list.add(new Item("B", 200));
-        list.add(new Item("C", 300));
-        list.add(new Item("A", 100));
-        list.remove(new Item("A", 500)); // equals は name のみ一致なので「A」だけ除去。先頭の 1 件のみ
-        list.forEach(i -> System.out.println(i.getName())); // B, C, A（残りの順）
+        ArrayList<Ticket> pile = new ArrayList<>();
+        pile.add(new Ticket("kyoto", 1200));
+        pile.add(new Ticket("osaka", 900));
+        pile.add(new Ticket("nara", 800));
+        pile.add(new Ticket("kyoto", 1500)); // city だけ見る equals にはもう一通マッチする
+        pile.remove(new Ticket("kyoto", 9999)); // 先頭の kyoto だけ消える（2 枚目キョウトは残る）
+        pile.forEach(t -> System.out.println(t.city()));
     }
 }
 ```
@@ -859,20 +857,20 @@ public class Main {
 ```java
 import java.util.ArrayList;
 
-public class Main {
+public class SkipShow {
     public static void main(String[] args) {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("A");
-        list.add("B");
-        list.add("C");
-        for (String str : list) {
-            if ("B".equals(str)) {
-                list.remove(str); // 削除で繰り上がり。次の next が「見落とし」になり得る
+        ArrayList<String> deck = new ArrayList<>();
+        deck.add("uno");
+        deck.add("dos");
+        deck.add("tres");
+        for (String face : deck) {
+            if ("dos".equals(face)) {
+                deck.remove(face); // 繰り上がり＋カーソルで次要素を読み損ねる典型
             } else {
-                System.out.println(str);
+                System.out.println(face);
             }
         }
-        // 典型：A だけ表示され、C には到達しないパターン（公式解説のカーソル図と対応）
+        // よくある結果：uno だけ印字され tres は飛ぶ、など環境により挙動を打印で確認すること
     }
 }
 ```
@@ -903,22 +901,25 @@ for-each を「書きぶんの for」と同一視して **頭の中でリスト�
 ```java
 import java.util.ArrayList;
 
-public class Main {
+public class CmeLikely {
     public static void main(String[] args) {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("A");
-        list.add("B");
-        list.add("C");
-        list.add("D");
-        list.add("E");
-        for (String str : list) {
-            if ("C".equals(str)) {
-                list.remove(str); // 構造変更
+        ArrayList<String> lanes = new ArrayList<>();
+        lanes.add("n");
+        lanes.add("e");
+        lanes.add("s");
+        lanes.add("w");
+        lanes.add("u");
+        try {
+            for (String compass : lanes) {
+                if ("s".equals(compass)) {
+                    lanes.remove(compass); // foreach 内の構造変更
+                }
             }
-        }
-        // この後も同じイテレーションで next が走ると ConcurrentModificationException になり得る
-        for (String str : list) {
-            System.out.println(str);
+            for (String compass : lanes) {
+                System.out.println(compass);
+            }
+        } catch (RuntimeException ex) {
+            System.out.println(ex.getClass().getSimpleName()); // ConcurrentModificationException など
         }
     }
 }
@@ -952,21 +953,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Main {
+public class ListKinds {
     public static void main(String[] args) {
-        // 固定長・サイズ変更不可に近い代表（add で UnsupportedOperationException になり得る）
-        List<Integer> fixed1 = List.of(1, 2, 3);
-        // fixed1.add(9);
+        List<Integer> sealed = List.of(11, 22, 33);
+        // sealed.add(99); // 実行時 unsupported
 
-        List<Integer> fixed2 = Arrays.asList(1, 2, 3);
-        // fixed2.add(9);
+        List<Integer> boxed = Arrays.asList(44, 55, 66);
+        // boxed.add(77); // 同様に追加できないリストの代表例
 
-        // 初期容量 3 だが、中身は普通の可変 ArrayList
-        ArrayList<Integer> growable = new ArrayList<>(3);
-        growable.add(1);
-        growable.add(2);
-        growable.add(3);
-        growable.add(4); // OK
+        ArrayList<Integer> heap = new ArrayList<>(3); // ここでの 3 はあくまで初期バッファ
+        heap.add(100);
+        heap.add(200);
+        heap.add(300);
+        heap.add(400); // 増やしても大丈夫＝こちらは可変
     }
 }
 ```
@@ -996,12 +995,12 @@ public class Main {
 ```java
 import java.util.Set;
 
-// メモ：問3 の例。正解 { C,D,E,F,I } に対し自分 { B,C,D,F,I } は B が余計・E が欠けで不正解
+/** 「複数正解」を集合として比べるだけの体感用（記号や個数は自由に変えよ） */
 public class AnswerSetCompare {
     public static void main(String[] args) {
-        Set<String> official = Set.of("C", "D", "E", "F", "I");
-        Set<String> mine = Set.of("B", "C", "D", "F", "I");
-        System.out.println(official.equals(mine)); // false
+        Set<String> textbook = Set.of("M", "N", "O", "P", "Q");
+        Set<String> student = Set.of("L", "N", "O", "P", "Q"); // L が余計 & M が欠ける例
+        System.out.println(textbook.equals(student)); // false
     }
 }
 ```
@@ -1021,19 +1020,17 @@ public class AnswerSetCompare {
 ### 例となるコード
 
 ```java
-// 問18イメージ：計算結果は 21 だが、選択肢ラベルを取り違えないこと
-int len = "abcde".length();
-int capacity = len + 16; // 21
-// メモ: System.out.println(capacity); → 21
-// 解答欄: 「21 が出る選択肢は D」と用紙の定義と必ず対応させる
+// ① メモには「算出値」、マークには「選択肢記号」を二段で書く
+String token = "vwxyz"; // len=5 の任意文字列でよい
+int len = token.length(); // → 計算草稿
+int guessedCapacity = len + 16;
+System.out.println("draft=" + guessedCapacity); // ← これが「何番の肢か」を用紙と突き合わせる
 
-// 問12イメージ
-int idx = "abcde".indexOf("abcdef"); // -1
-// メモ: -1 → 選択肢 E（問題冊子の並びでは E が -1 の場合）
+// ② 「見つからない」型の問題は結果が負になりがちだが、記号との対応は毎回その場で確認
+String hay = "qrstu";
+System.out.println(hay.indexOf("qrstuv")); // -1 だとしても選択肢一覧のどこかは冊子依存
 
-// 自動化したいときは Map で対応を作る発想（試験中の手順の比喩）
-// int value = -1;
-// char choice = (value == -1) ? 'E' : '?';
+// ③ 自動採点はできなくてよいので、自分用ルールでも「草稿→選択肢」を必ず両方書く癖だけ作る
 ```
 
 ### 復習チェック
