@@ -2,6 +2,8 @@
 
 本章は、採点結果の **「不正解から整理した弱点学習領域一覧」**（`local_problems/scoring_result/Chapter2_ScoringResult_1once.md`）と、公式の **解答・解説**（`local_problems/answers/Chapter2_answers.md`）に基づいて整理した弱点解説です。各項目は **不正解となった設問番号** を必ず紐づけています。
 
+以下の **例となるコード** は理解用の断片です。複数の `Main` が出てくる場合は、ファイルを分けるか、`jshell` で断片だけ試すなどしてコンパイルしてください。
+
 ---
 
 ## 領域 1：整数リテラルと進数表記（該当：**問2**）
@@ -14,6 +16,19 @@
 
 - `0827` は 8 進解釈となるが、8・9 を含むため **不正**。
 - `0b100001011` は 2 進として有効。
+
+### 例となるコード
+
+```java
+// 8 進：先頭 0。各桁は 0〜7 のみ（8, 9 はコンパイルエラー）
+// int bad = 0827;
+
+// これらは問題文の他の選択肢イメージとして有効な例
+int dec = 267;           // 10 進（接頭辞なし）
+int oct = 0413;          // 8 進
+int hex = 0x10B;         // 16 進
+int bin = 0b100001011;   // 2 進
+```
 
 ### 陥りやすい罠
 
@@ -36,6 +51,23 @@
 
 - 誤りの例：` _123 `（先頭）、`123_`（末尾）、`3_.1415F`（ドット前後）、`999_99_9999_L`（`L` の前後）、`0x_52`（`0x` と数字の間）などが **ルール 2** に抵触。
 
+### 例となるコード
+
+```java
+// OK：先頭末尾・記号の前後に _ が来ていない
+int a = 123_456_789;
+int b = 5_______2;
+byte g = 0b0_1;
+int h = 0_52;
+
+// NG 例（コンパイルエラー）
+// int c = _123_456_789;   // 先頭
+// int d = 123_456_789_;   // 末尾
+// float e = 3_.1415F;     // '.' の前後
+// long f = 999_99_9999_L; // 'L' の前後（仕様上 NG パターン）
+// int i = 0x_52;           // 0x と数字の間
+```
+
 ### 陥りやすい罠
 
 「`_` は自由」ではない。**複数選択では正解集合の完全一致**が求められるため、1 つでも欠けると不正解。
@@ -57,6 +89,19 @@
 
 - `int ${d}` は `{` 等で **識別子として成立しない** → CE。  
 - `int g.a` は `.` が **フィールド参照の演算子**であり、名前の途中に書けない → CE。
+
+### 例となるコード
+
+```java
+// OK
+int $a = 100;
+int b_ = 200;
+int _0 = 300;
+
+// NG（識別子として解釈できない）
+// int ${d} = 400;
+// int g.a = 700;
+```
 
 ### 陥りやすい罠
 
@@ -81,6 +126,22 @@
 
 正解セット **A,B,D,F**。C は `char c2 = c1` が NG。E は `1.99` を `float` に。G は `char` と `String` の不一致。
 
+### 例となるコード
+
+```java
+// 正しい例（設問の正解イメージ）
+int[][] a = {{1, 1}, {2, 2}};
+short b = (short) 'A';
+boolean d = (10 == 10);
+int f = 12_34;
+
+// 誤りの例
+// byte c1 = 10;
+// char c2 = c1;          // byte → char は暗黙変換不可
+// float e = 1.99;        // 1.99 は double リテラル
+// String g = 'a';        // char を String に代入不可
+```
+
 ### 陥りやすい罠
 
 「キャストがあるから全部 OK」と捉え、`byte`/`char` 間を混同する。
@@ -101,6 +162,26 @@
 ### 公式解説ベースの要点
 
 設問では `hello` 内で `msg.replaceAll(...)` の戻り値を破棄しているため、`main` の `str` は **置換前のまま出力**される → 正解 A。
+
+### 例となるコード
+
+```java
+public class Demo {
+    public static void main(String[] args) {
+        String str = "hoge, world.";
+        hello(str);
+        System.out.println(str); // hoge, world.（中身は変わらない）
+
+        String s2 = "hoge, world.";
+        s2 = s2.replaceAll("hoge", "hello"); // 戻り値を代入すれば別インスタンスを参照
+        System.out.println(s2);               // hello, world.
+    }
+
+    static void hello(String msg) {
+        msg.replaceAll("hoge", "hello"); // 戻り値を破棄している＝msg の参照先は不変
+    }
+}
+```
 
 ### 陥りやすい罠
 
@@ -126,6 +207,19 @@ API は理解できていても **選択肢の記号を取り違える**（メ�
 - 「abcde」に対し「abcdef」を探す → **存在しない** → **-1**（問12 は E）。  
 - 「abcde」で「bcd」の開始は **インデックス 1** を表示 → 選択肢 **A**（問20）。
 
+### 例となるコード
+
+```java
+String str = "abcde";
+
+// 問12：部分文字列 "abcdef" は存在しない → -1
+System.out.println(str.indexOf("abcdef")); // -1
+
+// 問20："bcd" の開始位置はインデックス 1（b の位置）。終了インデックスではない。
+StringBuilder sb = new StringBuilder("abcde");
+System.out.println(sb.indexOf("bcd")); // 1
+```
+
 ### 陥りやすい罠
 
 説明では `-1` や `1` と分かっていても **選択肢 D など別記号をマーク**。  
@@ -150,6 +244,20 @@ API は理解できていても **選択肢の記号を取り違える**（メ�
 
 `"abcde"`（長さ 5）で初期化 → **5 + 16 = 21** → 選択肢 **D**。
 
+### 例となるコード
+
+```java
+// 設問：文字列で初期化した StringBuilder の capacity()
+StringBuilder sb = new StringBuilder("abcde");
+System.out.println(sb.length());    // 5（文字列の長さ）
+System.out.println(sb.capacity()); // 21（概ね「長さ + 16」）
+
+// 引数なしコンストラクタは別の初期容量（典型例として 16）
+StringBuilder empty = new StringBuilder();
+System.out.println(empty.length());    // 0
+System.out.println(empty.capacity());  // 16（実装依存の点は仕様・JDK で確認）
+```
+
 ### 陥りやすい罠
 
 「5+16」と計算メモは正しいのに **選択肢 B（5）** など **表示値と記号の対応ミス**。
@@ -172,6 +280,20 @@ API は理解できていても **選択肢の記号を取り違える**（メ�
 
 選択肢 **D**（「改行には `\n` を使う」系の説明）は、テキストブロックの利点と食い違うため **誤った説明** として正解（＝この問は「誤りを選ぶ」タイプ）。
 
+### 例となるコード
+
+```java
+// テキストブロックでは、ソース上の改行がそのまま文字列に含まれやすい（\n を必須ではない）
+String block = """
+    1行目
+    2行目
+    """;
+System.out.println(block); // 先頭終端の扱いは仕様によるが「改行だけ \n と書け」だけでは説明できない
+
+// 従来のリテラルでは改行や " のエスケープが多用されがち（対比用）
+String classic = "1行目\n\"引用\"\n2行目\n";
+```
+
 ### 陥りやすい罠
 
 「正しそうな一般論」に見える **D を正と誤認**。
@@ -191,6 +313,17 @@ API は理解できていても **選択肢の記号を取り違える**（メ�
 ### 公式解説ベースの要点
 
 **D** は開始後に改行があり、合法。C/E 等は開始直後に本文で NG。
+
+### 例となるコード
+
+```java
+// OK：開始 """ の直後に改行がある
+String ok = """
+    this is textblock sample.""";
+
+// NG：開始 """ の直後にすぐ本文（コンパイルエラー）
+// String ng = """this is textblock sample.""";
+```
 
 ### 陥りやすい罠
 
@@ -212,6 +345,19 @@ API は理解できていても **選択肢の記号を取り違える**（メ�
 
 出力は **選択肢 A** のパターン（相対インデントが `_A` / `__B` / `___C` のような整い方—設問・公式図に従う）。
 
+### 例となるコード
+
+```java
+// 共通の左インデント（最も浅い行）が取り除かれ、相対だけが残るイメージ
+String str = """
+        A
+    B
+C
+""";
+// 実際のスペース量はソースのインデントに依存。公式の問23と同様に「最も浅い行」を基準にストリップ
+System.out.println(str);
+```
+
 ### 陥りやすい罠
 
 「ソース上の見た目の揃い」をそのまま出力に貼り付ける想像。
@@ -231,6 +377,25 @@ API は理解できていても **選択肢の記号を取り違える**（メ�
 ### 公式解説ベースの要点
 
 設問の各 `if` は **すべて true** になり得て `count` は **3**（選択肢 **D**）。
+
+### 例となるコード
+
+```java
+// 設問の骨格：intern() はプール上の同一表現に揃い、== が true になりやすい
+String a = "abc";
+String b = new String(a);
+int count = 0;
+if (a.intern() == "abc") {
+    count++;
+}
+if (b.intern() == "abc") {
+    count++;
+}
+if (a.intern() == b.intern()) {
+    count++;
+}
+System.out.println(count); // 3
+```
 
 ### 陥りやすい罠
 
@@ -252,9 +417,19 @@ API は理解できていても **選択肢の記号を取り違える**（メ�
 
 選択肢 **E**（ハッシュコード表示）。
 
+### 例となるコード
+
+```java
+int[] array = new int[0]; // 要素 0 個でもインスタンスは作れる
+System.out.println(array);                // [I@xxxx（環境により異なる／要素は並ばない）
+
+// 中身を人が読める形で見たいとき
+System.out.println(java.util.Arrays.toString(array)); // []
+```
+
 ### 陥りやすい罠
 
-「空だからエラー」「`{ }` と表示」の想像。`**Arrays.toString`** との混同。
+「空だからエラー」「`{ }` と表示」の想像。`Arrays.toString` との混同。
 
 ### 復習チェック
 
@@ -271,6 +446,20 @@ API は理解できていても **選択肢の記号を取り違える**（メ�
 ### 公式解説ベースの要点
 
 選択肢 **E**（**A〜D はすべて不正な宣言**）。
+
+### 例となるコード
+
+```java
+// NG：宣言で要素数を書くことはできない
+// int[3] a;
+// int b[2];
+
+// OK：次元は [] の並びだけ。長さは new の側
+int[] c;
+int d[];
+int[][] e;
+int[] f[] = new int[3][];
+```
 
 ### 陥りやすい罠
 
@@ -294,6 +483,25 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 
 正解は **A, B, F**。
 
+### 例となるコード
+
+```java
+// NG（CE）：左辺 1 次元に 2 次元を代入
+// int[] a = new int[2][3];
+
+// NG（CE）：要素数に double
+// int[] b = new int[2.3];
+
+// OK
+int[] c = new int[2 * 3];
+int x = 2, y = 3;
+int[] d = new int[x * y];
+int[][] e = new int[2][];
+
+// NG（CE）：1 次元目を空にして 2 次元目だけ指定
+// int[][] f = new int[][3];
+```
+
 ### 陥りやすい罠
 
 **E（`new int[2][]`）を誤ってエラー扱い**。複数選択の取りこぼし。
@@ -313,6 +521,30 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 ### 公式解説ベースの要点
 
 選択肢 **E**。
+
+### 例となるコード
+
+```java
+class Item {
+    String name;
+    int price = 100;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Item[] items = new Item[3]; // 要素は null のまま（Item は new していない）
+        // int total = 0;
+        // for (int i = 0; i < items.length; i++) {
+        //     total += items[i].price; // NullPointerException
+        // }
+
+        // 正しくは要素にインスタンスを代入してからアクセス
+        for (int i = 0; i < items.length; i++) {
+            items[i] = new Item();
+        }
+    }
+}
+```
 
 ### 陥りやすい罠
 
@@ -336,6 +568,27 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 
 正解は **B, C, D**。
 
+### 例となるコード
+
+```java
+// NG：要素数と初期化子の併記
+// int[] a = new int[2]{ 2, 3 };
+
+// OK：空配列
+int[][] b = {};
+
+// OK：次元を明示した空配列
+int[][] c = new int[][]{};
+
+// OK：宣言と分離するときは要素数を [] で明示（初期化子だけは不可）
+int[] d;
+d = new int[]{ 2, 3 };
+
+// NG：初期化子だけを後から代入
+// int[] e;
+// e = { 2, 3 };
+```
+
 ### 陥りやすい罠
 
 **`new int[2]{2,3}` のような複合形**を見逃す。**E** が NG になる理由（初期化子は宣言と同時）を説明できない。
@@ -355,6 +608,21 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 ### 公式解説ベースの要点
 
 選択肢 **E**（NPE）。長さの単純加算で済まない。
+
+### 例となるコード
+
+```java
+// 1 行目配列の一部が null のまま length に触れると NPE
+String[][] array = {
+    { "A", "B" },
+    null,
+    { "C", "D", "E" },
+};
+// int total = 0;
+// for (String[] tmp : array) {
+//     total += tmp.length; // tmp が null のとき NullPointerException
+// }
+```
 
 ### 陥りやすい罠
 
@@ -376,6 +644,26 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 
 選択肢 **D**（コンパイルも実行も可）。
 
+### 例となるコード
+
+```java
+interface A {}
+
+abstract class B implements A {}
+
+class C extends B {}
+
+class D extends C {}
+
+public class Main {
+    public static void main(String[] args) {
+        A[] array = { new C(), null, new D() };
+        Object[] objArray = array; // スーパータイプの配列への代入は暗黙変換で可
+        // ここで読まなければ実行時例外は出ない典型的例
+    }
+}
+```
+
 ### 陥りやすい罠
 
 「配列の要素に `null` が混ざる」→ 即 NPE、と一般化してしまう（**使っていなければ発生しない**）。
@@ -395,6 +683,23 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 ### 公式解説ベースの要点
 
 正解は **B, D, E**。**A（null 不可）・C（重複不可）は誤り**。
+
+### 例となるコード
+
+```java
+import java.util.ArrayList;
+
+public class Demo {
+    public static void main(String[] args) {
+        ArrayList<String> list = new ArrayList<>();
+        list.add(null);   // OK：null を格納できる
+        list.add("A");
+        list.add("A");    // OK：重複可
+        list.add(1, "B"); // OK：位置指定の add も可能（別設問で境界に注意）
+        // 単一スレッド前提の高速な動的配列／スレッドセーフではない、と整理
+    }
+}
+```
 
 ### 陥りやすい罠
 
@@ -416,6 +721,24 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 
 表示は **`A10B`**（`char` は `Character` として格納・`print` で文字に見える、等の流れ）→ **F**。
 
+### 例となるコード
+
+```java
+import java.util.ArrayList;
+
+public class Main {
+    public static void main(String[] args) {
+        ArrayList list = new ArrayList<>(); // 左辺が生型 → 実質 Object 相当の要素
+        list.add("A");
+        list.add(10);    // Integer にボクシング
+        list.add('B');   // Character にボクシング
+        for (Object obj : list) {
+            System.out.print(obj); // A10B
+        }
+    }
+}
+```
+
 ### 陥りやすい罠
 
 「混在＝コンパイルエラー」と決めつける。
@@ -435,6 +758,21 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 ### 公式解説ベースの要点
 
 **E** が正解。
+
+### 例となるコード
+
+```java
+import java.util.ArrayList;
+
+public class Main {
+    public static void main(String[] args) {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("A"); // size == 1。有効な挿入位置は 0 または 1 の「間」のみのイメージ
+        // list.add(2, "B"); // IndexOutOfBoundsException（Index: 2, Size: 1）
+        list.add(1, "B"); // OK：末尾に相当する隙間への挿入
+    }
+}
+```
 
 ### 陥りやすい罠
 
@@ -456,6 +794,46 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 
 表示は **`B C A`**（先頭の `A` だけ除去）→ **B**。
 
+### 例となるコード
+
+```java
+import java.util.ArrayList;
+
+class Item {
+    private final String name;
+    private final int price;
+
+    Item(String name, int price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Item other) {
+            return name.equals(other.name); // price は比較しない
+        }
+        return false;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ArrayList<Item> list = new ArrayList<>();
+        list.add(new Item("A", 100));
+        list.add(new Item("B", 200));
+        list.add(new Item("C", 300));
+        list.add(new Item("A", 100));
+        list.remove(new Item("A", 500)); // equals は name のみ一致なので「A」だけ除去。先頭の 1 件のみ
+        list.forEach(i -> System.out.println(i.getName())); // B, C, A（残りの順）
+    }
+}
+```
+
 ### 陥りやすい罠
 
 「同値が 2 個あるから両方消える」。
@@ -475,6 +853,29 @@ C 言語などの **「スタック配列宣言」記法を Java に転写**し�
 ### 公式解説ベースの要点
 
 表示は **`A` のみ** → **C**。
+
+### 例となるコード
+
+```java
+import java.util.ArrayList;
+
+public class Main {
+    public static void main(String[] args) {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("A");
+        list.add("B");
+        list.add("C");
+        for (String str : list) {
+            if ("B".equals(str)) {
+                list.remove(str); // 削除で繰り上がり。次の next が「見落とし」になり得る
+            } else {
+                System.out.println(str);
+            }
+        }
+        // 典型：A だけ表示され、C には到達しないパターン（公式解説のカーソル図と対応）
+    }
+}
+```
 
 ### 陥りやすい罠
 
@@ -497,6 +898,32 @@ for-each を「書きぶんの for」と同一視して **頭の中でリスト�
 
 **E**。
 
+### 例となるコード
+
+```java
+import java.util.ArrayList;
+
+public class Main {
+    public static void main(String[] args) {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("A");
+        list.add("B");
+        list.add("C");
+        list.add("D");
+        list.add("E");
+        for (String str : list) {
+            if ("C".equals(str)) {
+                list.remove(str); // 構造変更
+            }
+        }
+        // この後も同じイテレーションで next が走ると ConcurrentModificationException になり得る
+        for (String str : list) {
+            System.out.println(str);
+        }
+    }
+}
+```
+
 ### 陥りやすい罠
 
 「マルチスレッドだけ」と思う（公式：**シングルでも起きる**）。
@@ -518,6 +945,32 @@ for-each を「書きぶんの for」と同一視して **頭の中でリスト�
 
 正解は **A, C**。
 
+### 例となるコード
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        // 固定長・サイズ変更不可に近い代表（add で UnsupportedOperationException になり得る）
+        List<Integer> fixed1 = List.of(1, 2, 3);
+        // fixed1.add(9);
+
+        List<Integer> fixed2 = Arrays.asList(1, 2, 3);
+        // fixed2.add(9);
+
+        // 初期容量 3 だが、中身は普通の可変 ArrayList
+        ArrayList<Integer> growable = new ArrayList<>(3);
+        growable.add(1);
+        growable.add(2);
+        growable.add(3);
+        growable.add(4); // OK
+    }
+}
+```
+
 ### 陥りやすい罠
 
 「サイズ関連のパラメータ＝固定長」と誤読。
@@ -538,6 +991,21 @@ for-each を「書きぶんの for」と同一視して **頭の中でリスト�
 
 各問の見出しの **「正解:」行** と自分の記号セットを **最後に並べて突合**。
 
+### 例となるコード
+
+```java
+import java.util.Set;
+
+// メモ：問3 の例。正解 { C,D,E,F,I } に対し自分 { B,C,D,F,I } は B が余計・E が欠けで不正解
+public class AnswerSetCompare {
+    public static void main(String[] args) {
+        Set<String> official = Set.of("C", "D", "E", "F", "I");
+        Set<String> mine = Set.of("B", "C", "D", "F", "I");
+        System.out.println(official.equals(mine)); // false
+    }
+}
+```
+
 ### 復習チェック
 
 - [ ] チェックリスト：各肢について **○/×/迷い** を付け、そのうえで **カウントが n と一致するか**  
@@ -549,6 +1017,24 @@ for-each を「書きぶんの for」と同一視して **頭の中でリスト�
 ### 核心となるルール
 
 メモ上の答え（数値・文字列）と **解答用紙の記号**は別レイヤー。**計算や API 理解の直後に**「どの選択肢がその値か」を **必ず照合**。
+
+### 例となるコード
+
+```java
+// 問18イメージ：計算結果は 21 だが、選択肢ラベルを取り違えないこと
+int len = "abcde".length();
+int capacity = len + 16; // 21
+// メモ: System.out.println(capacity); → 21
+// 解答欄: 「21 が出る選択肢は D」と用紙の定義と必ず対応させる
+
+// 問12イメージ
+int idx = "abcde".indexOf("abcdef"); // -1
+// メモ: -1 → 選択肢 E（問題冊子の並びでは E が -1 の場合）
+
+// 自動化したいときは Map で対応を作る発想（試験中の手順の比喩）
+// int value = -1;
+// char choice = (value == -1) ? 'E' : '?';
+```
 
 ### 復習チェック
 
