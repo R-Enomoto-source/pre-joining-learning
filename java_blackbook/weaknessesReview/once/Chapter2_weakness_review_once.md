@@ -167,7 +167,7 @@ int pretty = 99_88_77;
 ### 例となるコード
 
 ```java
-public class Demo {
+class Demo {
     public static void main(String[] args) {
         String line = "DRAFT: ready.";
         sanitize(line); // 呼び出し側の line は変わらない
@@ -653,7 +653,7 @@ class Phone extends Device {}
 
 class Tablet extends Phone {}
 
-public class Desk {
+class Desk {
     public static void main(String[] args) {
         Remote[] dock = { new Phone(), null, new Tablet() };
         Object[] any = dock; // 配列の副次型 → Object[]
@@ -687,7 +687,7 @@ public class Desk {
 ```java
 import java.util.ArrayList;
 
-public class Demo {
+class Demo {
     public static void main(String[] args) {
         ArrayList<String> bag = new ArrayList<>();
         bag.add(null);
@@ -723,7 +723,7 @@ public class Demo {
 ```java
 import java.util.ArrayList;
 
-public class MixBox {
+class MixBox {
     public static void main(String[] args) {
         ArrayList bag = new ArrayList<>(); // 生型：要素は Object 想定で受け止められる
         bag.add("X");
@@ -761,7 +761,7 @@ public class MixBox {
 ```java
 import java.util.ArrayList;
 
-public class SlotDemo {
+class SlotDemo {
     public static void main(String[] args) {
         ArrayList<String> queue = new ArrayList<>();
         queue.add("only"); // size == 1 のとき index 2 は「まだ存在しない隙間」
@@ -857,7 +857,7 @@ class Ledger {
 ```java
 import java.util.ArrayList;
 
-public class SkipShow {
+class SkipShow {
     public static void main(String[] args) {
         ArrayList<String> deck = new ArrayList<>();
         deck.add("uno");
@@ -901,7 +901,7 @@ for-each を「書きぶんの for」と同一視して **頭の中でリスト�
 ```java
 import java.util.ArrayList;
 
-public class CmeLikely {
+class CmeLikely {
     public static void main(String[] args) {
         ArrayList<String> lanes = new ArrayList<>();
         lanes.add("n");
@@ -953,7 +953,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ListKinds {
+class ListKinds {
     public static void main(String[] args) {
         List<Integer> sealed = List.of(11, 22, 33);
         // sealed.add(99); // 実行時 unsupported
@@ -996,7 +996,7 @@ public class ListKinds {
 import java.util.Set;
 
 /** 「複数正解」を集合として比べるだけの体感用（記号や個数は自由に変えよ） */
-public class AnswerSetCompare {
+class AnswerSetCompare {
     public static void main(String[] args) {
         Set<String> textbook = Set.of("M", "N", "O", "P", "Q");
         Set<String> student = Set.of("L", "N", "O", "P", "Q"); // L が余計 & M が欠ける例
