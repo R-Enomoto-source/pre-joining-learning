@@ -79,5 +79,6 @@ removeメ ソッ ドの実行後に読み出 しをすると、java.ut‖.Concur
 固定長リストの作成方法
 Arraysク ラスのasListメ ソッドを使い、配列からリス トのインスタンスを生成する (選択肢C)
 型　変数　＝　List.of(変数と同じ型の値);
-Intenger 
+Intenger list List.of(4,5,6);
 Listイ ンタフェースのofメ ソッドを使いインスタンスを生成する (選択肢A)
+型　変数　＝　ArraysListList.(new ラッパークラス);
