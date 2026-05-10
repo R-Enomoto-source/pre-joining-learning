@@ -50,7 +50,7 @@ replaceメ ソッ ドの引数は、char型 かCharSequence型 のうち、ど�
 33. AD 「new と {} を両方使うときは [要素数] を書かない」
        「{} だけで初期化したいなら、変数宣言と 同じ行 に書く」
 34. D　「多次元配列に null が混ざっていて、それを .length や [] で触ったら → 必ず NullPointerException」
-35. A
+35. A　
 36. B
 37. BCE
 38. C
