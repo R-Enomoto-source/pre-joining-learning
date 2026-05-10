@@ -76,3 +76,6 @@ for文では削除した要素が繰り上がった結果、要素が減って�
 43. A　
 removeメ ソッ ドの実行後に読み出 しをすると、java.ut‖.ConcurrentModificationException例外がスローされる。
 44. BD　
+固定長リストの作成方法
+Arraysク ラスのasListメ ソッドを使い、配列からリス トのインスタンスを生成する (選択肢C)
+Listイ ンタフェースのofメ ソッドを使いインスタンスを生成する (選択肢A)
