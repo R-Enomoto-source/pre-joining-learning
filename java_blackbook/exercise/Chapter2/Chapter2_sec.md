@@ -77,10 +77,10 @@ for文では削除した要素が繰り上がった結果、要素が減って�
 removeメ ソッ ドの実行後に読み出 しをすると、java.ut‖.ConcurrentModificationException例外がスローされる。
 44. BD　
 固定長リストの作成方法
-Arraysク ラスのasListメ ソッドを使い、配列からリス トのインスタンスを生成する
-型　変数　＝　List.of(変数と同じ型の値);
-Intenger list List.of(4,5,6);
-Listイ ンタフェースのofメ ソッドを使いインスタンスを生成する
-型　ラッパークラス　＝　ArraysListList.(new ラッパークラス[]{変数と同じ型の値});
-Integer list = Arrays.asList(new Integer[] {1,2,3});
+方法1】Arraysクラスの asList メソッドを使い、配列からリストのインスタンスを生成する
+　書式：List<ラッパークラス> 変数 = Arrays.asList(new ラッパークラス[]{値1, 値2, ...});
+　例　：List<Integer> list = Arrays.asList(new Integer[]{1, 2, 3});
+【方法2】Listインタフェースの of メソッドを使いインスタンスを生成する
+　書式：List<型> 変数 = List.of(値1, 値2, ...);
+　例　：List<Integer> list = List.of(4, 5, 6);
 
