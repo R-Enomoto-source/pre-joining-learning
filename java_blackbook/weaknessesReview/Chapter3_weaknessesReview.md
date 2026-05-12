@@ -17,7 +17,6 @@
 
 | 問 | `Chapter3_answers.md` で扱っている主題（要約） | 試験トピック（1Z0-829） |
 |----|-----------------------------------------------|-------------------------|
-| 2 | 型変換・コンパイルエラーになる代入／演算（リテラル既定型、`long` 混在、`float` 等） | **Handling date, time, text, numeric and boolean values**（プリミティブ・数値リテラル・キャストの可否） |
 | 6 | 演算子の優先順位（`%` `*` `/` と加算、左からの評価） | **Handling date, time, text, numeric and boolean values**（数値式の評価） |
 | 7 | 算術演算子の優先順位と **整数除算の切り捨て** | **Handling date, time, text, numeric and boolean values** |
 | 8 | 参照の **同一性**（`==` と `new` による参照の変化） | **Utilizing Java Object-Oriented Approach**（オブジェクト参照の理解） |
