@@ -18,7 +18,7 @@
 | 問 | `Chapter3_answers.md` で扱っている主題（要約） | 試験トピック（1Z0-829） |
 |----|-----------------------------------------------|-------------------------|
 | 2 | 型変換・コンパイルエラーになる代入／演算（リテラル既定型、`long` 混在、`float` 等） | **Handling date, time, text, numeric and boolean values**（プリミティブ・数値リテラル・キャストの可否） |
-| 6 | 演算子の優先順位（`%` `*` `/` と加算、左からの評価） | 同上（数値式の評価）／**Controlling Program Flow** 学習時の前提としての式の理解 |
+| 6 | 演算子の優先順位（`%` `*` `/` と加算、左からの評価） | **Handling date, time, text, numeric and boolean values**（数値式の評価） |
 | 7 | 算術演算子の優先順位と **整数除算の切り捨て** | **Handling date, time, text, numeric and boolean values** |
 | 8 | 参照の **同一性**（`==` と `new` による参照の変化） | **Utilizing Java Object-Oriented Approach**（オブジェクト参照の理解） |
 | 9 | **equals のオーバーライド**と比較に使うフィールド | **Utilizing Java Object-Oriented Approach** |
@@ -65,11 +65,12 @@
 - **弱点の中身**: `if` / `else` の中カッコ省略、`switch` 文の型・case 定数・フォールスルー・`default` の位置、`switch` 式の網羅、`while` / `do`-`while` / `for` の構文、`break` / `continue` / **ラベル**と二重ループ。  
 - **復習の芯**: 問 14〜22、26〜28、40、43 の解説。
 
-### 4. Working with Arrays and Collections（配列に限定した部分）
+### 4. Working with Arrays and Collections（配列の作成・走査）
 
 - **含まれる誤答**: 33, 34  
 - **弱点の中身**: 二重ループ、**`array.length` と `array[i].length` の違い**、ジグザグ配列の走査。  
-- **復習の芯**: 問 33・34 の解説。
+- **復習の芯**: 問 33・34 の解説。  
+- **注**: Oracle の公開トピックでは配列とコレクションが同じ大見出しにまとまっている資料が多いです。第 3 章の誤答は **配列**に限定されます。
 
 ---
 
